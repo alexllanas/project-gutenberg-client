@@ -3,33 +3,70 @@ package com.example.simplebookwormapp.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "books")
 public class Book implements Parcelable {
 
-    private int id;
-    private String title;
-    private Author[] authors;
-    private Formats formats;
+    @PrimaryKey
+    @NonNull
+    private long book_id;
 
-    public Book() {
-        this.title = title;
+    @ColumnInfo(name = "title")
+    private String title;
+
+    @ColumnInfo(name = "authors")
+    private Author[] authors;
+
+    public String[] getSubjects() {
+        return subjects;
     }
 
-    public Book(int id, String title, Author[] authors, Formats formats) {
-        this.id = id;
+    public void setSubjects(String[] subjects) {
+        this.subjects = subjects;
+    }
+
+    @ColumnInfo(name = "subjects")
+    private String[] subjects;
+
+    @ColumnInfo(name = "formats")
+    private Formats formats;
+
+    public int getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(int timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    @ColumnInfo(name = "timestamp")
+    private int timestamp;
+
+    public Book() {
+    }
+
+    public Book(long book_id, String title, Author[] authors, String[] subjects, Formats formats, int timestamp) {
+        this.book_id = book_id;
         this.title = title;
         this.authors = authors;
+        this.subjects = subjects;
         this.formats = formats;
+        this.timestamp = timestamp;
     }
 
     public Book(Parcel in) {
     }
 
-    public int getId() {
-        return id;
+    public long getBook_id() {
+        return book_id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setBook_id(long book_id) {
+        this.book_id = book_id;
     }
 
     public String getTitle() {
@@ -80,7 +117,7 @@ public class Book implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeInt(id);
+        parcel.writeLong(book_id);
         parcel.writeString(title);
         parcel.writeParcelableArray(authors, i);
         parcel.writeParcelable(formats, i);

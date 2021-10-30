@@ -2,6 +2,10 @@ package com.example.simplebookwormapp.util;
 
 public class Constants {
 
+    public static final int CONNECTION_TIMEOUT = 10; // 10 seconds
+    public static final int READ_TIMEOUT = 2; // 2 seconds
+    public static final int WRITE_TIMEOUT = 2; // 2 seconds
+
     public static final String BASE_URL = "https://gutendex.com/";
 
     public static final String[] DEFAULT_BOOK_CATEGORIES =
