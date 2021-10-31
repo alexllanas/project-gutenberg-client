@@ -1,8 +1,6 @@
 package com.example.simplebookwormapp.repositories;
 
 import android.content.Context;
-import android.os.Parcelable;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -54,23 +52,7 @@ public class BookRepository {
             @Override
             protected void saveCallResult(@NonNull BookSearchResponse item) {
                 if (item.getBooks() != null) {
-                    Book[] books = new Book[item.getBooks().size()];
-
-                    int index = 0;
-                    for (long rowId : bookDao.insertBooks((Book[]) (item.getBooks().toArray(books)))) {
-                        if (rowId == -1) {
-                            Timber.d("saveCallResult: CONFLICT... This book is already in the cache");
-                            // If book already exists do not insert because timestamp will be overwritten.
-                            bookDao.updateBook(
-                                    books[index].getBook_id(),
-                                    books[index].getTitle(),
-                                    books[index].getAuthors(),
-                                    books[index].getFormats(),
-                                    books[index].getSubjects()
-                            );
-                        }
-                        index++;
-                    }
+                    saveResponse(item);
                 }
             }
 
@@ -91,6 +73,26 @@ public class BookRepository {
                 return RetrofitService.getBookApi().searchBook(query, String.valueOf(pageNumber));
             }
         }.getAsLiveData();
+    }
+
+    private void saveResponse(@NonNull BookSearchResponse item) {
+        Book[] books = new Book[item.getBooks().size()];
+
+        int index = 0;
+        for (long rowId : bookDao.insertBooks((Book[]) (item.getBooks().toArray(books)))) {
+            if (rowId == -1) {
+                Timber.d("saveCallResult: CONFLICT... This book is already in the cache");
+                // If book already exists do not insert because timestamp will be overwritten.
+                bookDao.updateBook(
+                        books[index].getBook_id(),
+                        books[index].getTitle(),
+                        books[index].getAuthors(),
+                        books[index].getFormats(),
+                        books[index].getSubjects()
+                );
+            }
+            index++;
+        }
     }
 
 }
