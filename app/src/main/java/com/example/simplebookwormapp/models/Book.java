@@ -8,8 +8,16 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.google.gson.annotations.Expose;
+
+import java.util.ArrayList;
+
 @Entity(tableName = "books")
 public class Book implements Parcelable {
+
+    /**
+     * Class fields
+     */
 
     @PrimaryKey
     @NonNull
@@ -19,15 +27,7 @@ public class Book implements Parcelable {
     private String title;
 
     @ColumnInfo(name = "authors")
-    private Author[] authors;
-
-    public String[] getSubjects() {
-        return subjects;
-    }
-
-    public void setSubjects(String[] subjects) {
-        this.subjects = subjects;
-    }
+    private ArrayList<String> authors;
 
     @ColumnInfo(name = "subjects")
     private String[] subjects;
@@ -35,31 +35,45 @@ public class Book implements Parcelable {
     @ColumnInfo(name = "formats")
     private Formats formats;
 
-    public int getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(int timestamp) {
-        this.timestamp = timestamp;
-    }
-
     @ColumnInfo(name = "timestamp")
     private int timestamp;
+
+
+    /**
+     * Class constructors
+     */
 
     public Book() {
     }
 
+    public Book(Parcel in) {
+    }
+
+    /**
+     * The list of authors is constructed from an array of Author objects from the api response.
+     *
+     * @param book_id
+     * @param title
+     * @param authors
+     * @param subjects
+     * @param formats
+     * @param timestamp
+     */
     public Book(long book_id, String title, Author[] authors, String[] subjects, Formats formats, int timestamp) {
         this.book_id = book_id;
         this.title = title;
-        this.authors = authors;
+        for (Author author : authors) {
+            this.authors.add(author.getName());
+        }
         this.subjects = subjects;
         this.formats = formats;
         this.timestamp = timestamp;
     }
 
-    public Book(Parcel in) {
-    }
+
+    /**
+     * Getters and setters
+     */
 
     public long getBook_id() {
         return book_id;
@@ -77,12 +91,28 @@ public class Book implements Parcelable {
         this.title = title;
     }
 
-    public Author[] getAuthors() {
+    public ArrayList<String> getAuthors() {
         return authors;
     }
 
-    public void setAuthors(Author[] authors) {
+    public void setAuthors(ArrayList<String> authors) {
         this.authors = authors;
+    }
+
+    public String[] getSubjects() {
+        return subjects;
+    }
+
+    public void setSubjects(String[] subjects) {
+        this.subjects = subjects;
+    }
+
+    public int getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(int timestamp) {
+        this.timestamp = timestamp;
     }
 
     public Formats getFormats() {
@@ -92,6 +122,11 @@ public class Book implements Parcelable {
     public void setFormats(Formats formats) {
         this.formats = formats;
     }
+
+
+    /**
+     * Parcelable implementation
+     */
 
     public static Creator<Book> getCREATOR() {
         return CREATOR;
@@ -109,7 +144,6 @@ public class Book implements Parcelable {
         }
     };
 
-
     @Override
     public int describeContents() {
         return 0;
@@ -119,7 +153,7 @@ public class Book implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeLong(book_id);
         parcel.writeString(title);
-        parcel.writeParcelableArray(authors, i);
+        parcel.writeList(authors);
         parcel.writeParcelable(formats, i);
     }
 }

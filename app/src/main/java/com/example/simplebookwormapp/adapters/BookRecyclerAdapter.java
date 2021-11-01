@@ -18,12 +18,15 @@ import java.util.List;
 
 public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private static final int CATEGORY_TYPE = 1;
+    private static final int LOADING_TYPE = 1;
+    private static final int CATEGORY_TYPE = 2;
 
     private List<Book> mBooks;
-    private RequestManager requestManager;
+    private OnBookListener mOnBookListener;
+    private final RequestManager requestManager;
 
-    public BookRecyclerAdapter(RequestManager requestManager) {
+    public BookRecyclerAdapter(OnBookListener onBookListener, RequestManager requestManager) {
+        this.mOnBookListener = onBookListener;
         this.requestManager = requestManager;
     }
 
@@ -35,7 +38,11 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         switch (viewType) {
             case CATEGORY_TYPE: {
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_category_list_item, parent, false);
-                return new CategoryViewHolder(view, requestManager);
+                return new CategoryViewHolder(view, mOnBookListener, requestManager);
+            }
+            case LOADING_TYPE: {
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_loading_list_item, parent, false);
+                return new LoadingViewHolder(view);
             }
         }
 

@@ -17,14 +17,17 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder implements View.
 
     CircleImageView categoryImage;
     TextView categoryTitle;
+    OnBookListener listener;
     RequestManager requestManager;
 
-    public CategoryViewHolder(@NonNull View itemView, RequestManager requestManager) {
+    public CategoryViewHolder(@NonNull View itemView, OnBookListener onBookListener, RequestManager requestManager) {
         super(itemView);
         this.requestManager = requestManager;
-
+        this.listener = onBookListener;
         categoryImage = itemView.findViewById(R.id.category_image);
         categoryTitle = itemView.findViewById(R.id.category_title);
+
+        itemView.setOnClickListener(this);
     }
 
     public void onBind(Book book) {
@@ -37,6 +40,6 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder implements View.
 
     @Override
     public void onClick(View view) {
-
+        listener.onCategoryClick(categoryTitle.getText().toString());
     }
 }

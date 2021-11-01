@@ -10,13 +10,12 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.simplebookwormapp.models.Book;
 import com.example.simplebookwormapp.repositories.BookRepository;
+import com.example.simplebookwormapp.util.Constants;
 import com.example.simplebookwormapp.util.Resource;
 
 import java.util.List;
 
 public class BookListViewModel extends AndroidViewModel {
-
-    public static final String QUERY_EXHAUSTED = "No more results.";
 
     public enum ViewState {CATEGORIES, BOOKS}
 
@@ -112,7 +111,7 @@ public class BookListViewModel extends AndroidViewModel {
         if (listResource.status == Resource.Status.SUCCESS) {
             checkIfResourceExhausted(listResource);
         } else if (listResource.status == Resource.Status.ERROR) {
-            if (listResource.message.equals(QUERY_EXHAUSTED)) {
+            if (listResource.message.equals(Constants.QUERY_EXHAUSTED)) {
                 isQueryExhausted = true;
             }
         }
@@ -125,7 +124,7 @@ public class BookListViewModel extends AndroidViewModel {
                         new Resource<>(
                                 Resource.Status.ERROR,
                                 listResource.data,
-                                QUERY_EXHAUSTED
+                                Constants.QUERY_EXHAUSTED
                         )
                 );
                 isQueryExhausted = true;

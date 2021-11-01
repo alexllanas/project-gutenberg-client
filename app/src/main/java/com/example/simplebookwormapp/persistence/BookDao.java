@@ -12,6 +12,7 @@ import com.example.simplebookwormapp.models.Author;
 import com.example.simplebookwormapp.models.Book;
 import com.example.simplebookwormapp.models.Formats;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Dao
@@ -24,7 +25,7 @@ public interface BookDao {
     void insertBook(Book book);
 
     @Query("UPDATE books SET title = :title, authors = :authors, formats = :formats, subjects = :subjects WHERE book_id =:book_id")
-    void updateBook(long book_id, String title, Author[] authors, Formats formats, String[] subjects);
+    void updateBook(long book_id, String title, ArrayList<String> authors, Formats formats, String[] subjects);
 
     @Query("SELECT * FROM books WHERE title LIKE '%' || :query || '%' OR subjects LIKE '%' || :query || '%' " +
             "ORDER BY title DESC LIMIT (:pageNumber * 30)")
