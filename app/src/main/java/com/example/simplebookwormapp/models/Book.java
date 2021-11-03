@@ -8,9 +8,9 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Entity(tableName = "books")
 public class Book implements Parcelable {
@@ -26,8 +26,12 @@ public class Book implements Parcelable {
     @ColumnInfo(name = "title")
     private String title;
 
+//    @ColumnInfo(name = "authors")
+//    private ArrayList<String> authorsArray;
+
+    @SerializedName("authors")
     @ColumnInfo(name = "authors")
-    private ArrayList<String> authors;
+    private List<Author> authors;
 
     @ColumnInfo(name = "subjects")
     private String[] subjects;
@@ -59,12 +63,10 @@ public class Book implements Parcelable {
      * @param formats
      * @param timestamp
      */
-    public Book(long book_id, String title, Author[] authors, String[] subjects, Formats formats, int timestamp) {
+    public Book(long book_id, String title, List<Author> authors, String[] subjects, Formats formats, int timestamp) {
         this.book_id = book_id;
         this.title = title;
-        for (Author author : authors) {
-            this.authors.add(author.getName());
-        }
+        this.authors = authors;
         this.subjects = subjects;
         this.formats = formats;
         this.timestamp = timestamp;
@@ -91,11 +93,11 @@ public class Book implements Parcelable {
         this.title = title;
     }
 
-    public ArrayList<String> getAuthors() {
+    public List<Author> getAuthors() {
         return authors;
     }
 
-    public void setAuthors(ArrayList<String> authors) {
+    public void setAuthors(List<Author> authors) {
         this.authors = authors;
     }
 

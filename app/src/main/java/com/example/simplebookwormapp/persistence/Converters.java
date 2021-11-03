@@ -9,8 +9,23 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Converters {
+
+    @TypeConverter
+    public static String fromAuthorList(List<Author> authors) {
+        Gson gson = new Gson();
+        String json = gson.toJson(authors);
+        return json;
+    }
+
+    @TypeConverter
+    public static List<Author> toAuthorList(String authors) {
+        Type formatsType = new TypeToken<List<Author>>() {
+        }.getType();
+        return new Gson().fromJson(authors, formatsType);
+    }
 
     @TypeConverter
     public static String fromStringArrayList(ArrayList<String> list) {
@@ -21,7 +36,8 @@ public class Converters {
 
     @TypeConverter
     public static ArrayList<String> toStringArrayList(String value) {
-        Type formatsType = new TypeToken<ArrayList<String>>(){}.getType();
+        Type formatsType = new TypeToken<ArrayList<String>>() {
+        }.getType();
         return new Gson().fromJson(value, formatsType);
     }
 
@@ -34,7 +50,8 @@ public class Converters {
 
     @TypeConverter
     public static Formats toFormats(String value) {
-        Type formatsType = new TypeToken<Formats>(){}.getType();
+        Type formatsType = new TypeToken<Formats>() {
+        }.getType();
         return new Gson().fromJson(value, formatsType);
     }
 
@@ -47,7 +64,8 @@ public class Converters {
 
     @TypeConverter
     public static String[] toStringArray(String value) {
-        Type stringArrayType = new TypeToken<String[]>(){}.getType();
+        Type stringArrayType = new TypeToken<String[]>() {
+        }.getType();
         return new Gson().fromJson(value, stringArrayType);
     }
 }

@@ -1,4 +1,4 @@
-package com.example.simplebookwormapp;
+package com.example.simplebookwormapp.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
+
+import com.example.simplebookwormapp.R;
 
 public abstract class BaseActivity extends AppCompatActivity {
 

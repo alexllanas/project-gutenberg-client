@@ -1,17 +1,20 @@
-package com.example.simplebookwormapp;
+package com.example.simplebookwormapp.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.simplebookwormapp.R;
 import com.example.simplebookwormapp.adapters.BookRecyclerAdapter;
 import com.example.simplebookwormapp.adapters.OnBookListener;
 import com.example.simplebookwormapp.models.Book;
@@ -21,6 +24,8 @@ import com.example.simplebookwormapp.util.VerticalSpacingItemDecoration;
 import com.example.simplebookwormapp.viewmodels.BookListViewModel;
 
 import java.util.List;
+
+import timber.log.Timber;
 
 public class BookListActivity extends BaseActivity implements OnBookListener {
 
@@ -34,23 +39,41 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_list);
         mRecyclerView = findViewById(R.id.book_list);
+        mSearchView = findViewById(R.id.search_view);
 
-        mBookListViewModel = ViewModelProviders.of(this).get(BookListViewModel.class);
+        mBookListViewModel = new ViewModelProvider(this).get(BookListViewModel.class);
 
         initRecyclerView();
+        initSearchView();
         subscribeObservers();
-
-        mAdapter.displayBookCategories();
-
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
     }
 
+
     private void subscribeObservers() {
         mBookListViewModel.getBooks().observe(this, listResource -> {
-            if (listResource != null && listResource.data != null) {
-                processResourceByStatus(listResource);
+            if (listResource != null) {
+                Timber.d(listResource.status.toString());
+
+                if (listResource.data != null) {
+                    processResourceByStatus(listResource);
+                }
             }
         });
+
+        mBookListViewModel.getViewState().observe(this, viewState -> {
+            if (viewState != null) {
+                switch (viewState) {
+                    case CATEGORIES: {
+                        displayCategories();
+                    }
+                }
+            }
+        });
+    }
+
+    private void displayCategories() {
+        mAdapter.displayBookCategories();
     }
 
     private void processResourceByStatus(@NonNull Resource<List<Book>> listResource) {
@@ -64,31 +87,50 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
                 break;
             }
             case SUCCESS: {
-                // hide loading in adapter
-                // set resource data (books) in adapter
+                mAdapter.hideLoading();
+                mAdapter.setBooks(listResource.data);
                 break;
             }
         }
     }
 
     private void processErrorResource(Resource<List<Book>> listResource) {
-        // adapter should hide loading
-        // set resource data (book list) to adapter
-        // show optional Toast with error message
+        Timber.d("hello");
+        mAdapter.hideLoading();
+        mAdapter.setBooks(listResource.data);
+        Toast.makeText(BookListActivity.this, listResource.message, Toast.LENGTH_SHORT).show();
 
-        // check to see if results have been exhausted
         if (listResource.message.equals(Constants.QUERY_EXHAUSTED)) {
-            // tell adapter to display no results view at end of recyclerview
+            mAdapter.setQueryExhausted();
         }
     }
 
     private void processLoadingResource() {
         if (mBookListViewModel.getPageNumber() > 1) {
             // adapter should display loading for pagination
+            mAdapter.displayLoading();
         } else {
             // adapter should display only progress bar for loading page 1 data
+            mAdapter.displayOnlyLoading();
         }
     }
+
+
+    private void initSearchView() {
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchBookApi(query, false);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+    }
+
 
     private void initRecyclerView() {
         mAdapter = new BookRecyclerAdapter(this, initGlide());
@@ -101,16 +143,17 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
 
-//                if (!mRecyclerView.canScrollVertically(1)
-//                && )
+                if (!mRecyclerView.canScrollVertically(1) && mBookListViewModel.getViewState().getValue() == BookListViewModel.ViewState.BOOKS) {
+                    mBookListViewModel.searchNextPage();
+                }
             }
         });
         mRecyclerView.setAdapter(mAdapter);
     }
 
-    private void searchBookApi(String query) {
+    private void searchBookApi(String query, boolean searchTopic) {
         mRecyclerView.scrollToPosition(0);
-        mBookListViewModel.searchRecipesApi(query, 1);
+        mBookListViewModel.searchBooksApi(query, 1, searchTopic);
         mSearchView.clearFocus();
     }
 
@@ -126,11 +169,25 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
 
     @Override
     public void onBookClick(int position) {
-
+        Intent intent = new Intent(this, BookActivity.class);
+        intent.putExtra("book", mAdapter.getSelectedBook(position));
+        startActivity(intent);
     }
 
     @Override
     public void onCategoryClick(String category) {
-        searchBookApi(category);
+        Timber.d("%s has been clicked", category);
+        searchBookApi(category, true);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Timber.d(mBookListViewModel.getViewState().getValue().toString());
+        if (mBookListViewModel.getViewState().getValue() == BookListViewModel.ViewState.CATEGORIES)
+            super.onBackPressed();
+        else {
+            mBookListViewModel.cancelSearchRequest();
+            mBookListViewModel.setViewCategories();
+        }
     }
 }

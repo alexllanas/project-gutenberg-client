@@ -10,8 +10,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.Observer;
 
-import com.example.simplebookwormapp.AppExecutors;
 import com.example.simplebookwormapp.requests.responses.ApiResponse;
+
+import timber.log.Timber;
 
 // CacheObject: Type for the Resource data. (database cache)
 // RequestObject: Type for the API response. (network request)
@@ -27,30 +28,32 @@ public abstract class NetworkBoundResource<CacheObject, RequestObject> {
         init();
     }
 
-    private void init() {
+    private void init(){
 
         // update LiveData for loading status
-        results.setValue(Resource.loading(null));
+        results.setValue((Resource<CacheObject>) Resource.loading(null));
 
         // observe LiveData source from local db
         final LiveData<CacheObject> dbSource = loadFromDb();
 
-        results.addSource(dbSource, cacheObject -> {
+        results.addSource(dbSource, new Observer<CacheObject>() {
+            @Override
+            public void onChanged(@Nullable CacheObject cacheObject) {
 
-            results.removeSource(dbSource);
+                results.removeSource(dbSource);
 
-            if (shouldFetch(cacheObject)) {
-                // get data from the network
-                fetchFromNetwork(dbSource);
-            } else {
-                results.addSource(dbSource, new Observer<CacheObject>() {
-                    @Override
-                    public void onChanged(@Nullable CacheObject cacheObject) {
-                        if (cacheObject != null) {
+                if(shouldFetch(cacheObject)){
+                    // get data from the network
+                    fetchFromNetwork(dbSource);
+                }
+                else{
+                    results.addSource(dbSource, new Observer<CacheObject>() {
+                        @Override
+                        public void onChanged(@Nullable CacheObject cacheObject) {
                             setValue(Resource.success(cacheObject));
                         }
-                    }
-                });
+                    });
+                }
             }
         });
     }
@@ -61,69 +64,97 @@ public abstract class NetworkBoundResource<CacheObject, RequestObject> {
      * 3) stop observing the local db
      * 4) insert new data into local db
      * 5) begin observing local db again to see the refreshed data from network
-     *
      * @param dbSource
      */
-    private void fetchFromNetwork(final LiveData<CacheObject> dbSource) {
+    private void fetchFromNetwork(final LiveData<CacheObject> dbSource){
 
         Log.d(TAG, "fetchFromNetwork: called.");
 
         // update LiveData for loading status
-        results.addSource(dbSource, cacheObject -> setValue(Resource.loading(cacheObject)));
+        results.addSource(dbSource, new Observer<CacheObject>() {
+            @Override
+            public void onChanged(@Nullable CacheObject cacheObject) {
+                setValue(Resource.loading(cacheObject));
+            }
+        });
 
         final LiveData<ApiResponse<RequestObject>> apiResponse = createCall();
 
-        results.addSource(apiResponse, requestObjectApiResponse -> {
-            results.removeSource(dbSource);
-            results.removeSource(apiResponse);
+        results.addSource(apiResponse, new Observer<ApiResponse<RequestObject>>() {
+            @Override
+            public void onChanged(@Nullable final ApiResponse<RequestObject> requestObjectApiResponse) {
+                results.removeSource(dbSource);
+                results.removeSource(apiResponse);
 
-            /*
-                3 cases:
-                   1) ApiSuccessResponse
-                   2) ApiErrorResponse
-                   3) ApiEmptyResponse
-             */
+                /*
+                    3 cases:
+                       1) ApiSuccessResponse
+                       2) ApiErrorResponse
+                       3) ApiEmptyResponse
+                 */
 
-            if (requestObjectApiResponse instanceof ApiResponse.ApiSuccessResponse) {
-                Log.d(TAG, "onChanged: ApiSuccessResponse.");
+                if(requestObjectApiResponse instanceof ApiResponse.ApiSuccessResponse){
+                    Log.d(TAG, "onChanged: ApiSuccessResponse.");
 
-                appExecutors.diskIO().execute(() -> {
+                    appExecutors.diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
 
-                    // save the response to the local db
-                    //noinspection unchecked
-                    saveCallResult((RequestObject) processResponse((ApiResponse.ApiSuccessResponse) requestObjectApiResponse));
+                            // save the response to the local db
+                            saveCallResult((RequestObject) processResponse((ApiResponse.ApiSuccessResponse)requestObjectApiResponse));
 
-                    appExecutors.mainThread().execute(() -> {
-                        results.addSource(loadFromDb(), cacheObject -> {
-                            setValue(Resource.success(cacheObject));
-                        });
+                            appExecutors.mainThread().execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    results.addSource(loadFromDb(), new Observer<CacheObject>() {
+                                        @Override
+                                        public void onChanged(@Nullable CacheObject cacheObject) {
+                                            setValue(Resource.success(cacheObject));
+                                        }
+                                    });
+                                }
+                            });
+                        }
                     });
-                });
-            } else if (requestObjectApiResponse instanceof ApiResponse.ApiEmptyResponse) {
-                Log.d(TAG, "onChanged: ApiEmptyResponse");
-                appExecutors.mainThread().execute(() -> {
-                    results.addSource(loadFromDb(), cacheObject -> {
-                        setValue(Resource.success(cacheObject));
+                }
+                else if(requestObjectApiResponse instanceof ApiResponse.ApiEmptyResponse){
+                    Log.d(TAG, "onChanged: ApiEmptyResponse");
+                    appExecutors.mainThread().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            results.addSource(loadFromDb(), new Observer<CacheObject>() {
+                                @Override
+                                public void onChanged(@Nullable CacheObject cacheObject) {
+                                    setValue(Resource.success(cacheObject));
+                                }
+                            });
+                        }
                     });
-                });
-            } else if (requestObjectApiResponse instanceof ApiResponse.ApiErrorResponse) {
-                Log.d(TAG, "onChanged: ApiErrorResponse.");
-                results.addSource(dbSource, cacheObject -> setValue(
-                        Resource.error(
-                                ((ApiResponse.ApiErrorResponse) requestObjectApiResponse).getErrorMessage(),
-                                cacheObject
-                        )
-                ));
+                }
+                else if(requestObjectApiResponse instanceof ApiResponse.ApiErrorResponse){
+                    Log.d(TAG, "onChanged: ApiErrorResponse.");
+                    results.addSource(dbSource, new Observer<CacheObject>() {
+                        @Override
+                        public void onChanged(@Nullable CacheObject cacheObject) {
+                            setValue(
+                                    Resource.error(
+                                            ((ApiResponse.ApiErrorResponse) requestObjectApiResponse).getErrorMessage(),
+                                            cacheObject
+                                    )
+                            );
+                        }
+                    });
+                }
             }
         });
     }
 
-    private CacheObject processResponse(ApiResponse.ApiSuccessResponse response) {
+    private CacheObject processResponse(ApiResponse.ApiSuccessResponse response){
         return (CacheObject) response.getBody();
     }
 
-    private void setValue(Resource<CacheObject> newValue) {
-        if (results.getValue() != newValue) {
+    private void setValue(Resource<CacheObject> newValue){
+        if(results.getValue() != newValue){
             results.setValue(newValue);
         }
     }
@@ -138,23 +169,24 @@ public abstract class NetworkBoundResource<CacheObject, RequestObject> {
     protected abstract boolean shouldFetch(@Nullable CacheObject data);
 
     // Called to get the cached data from the database.
-    @NonNull
-    @MainThread
+    @NonNull @MainThread
     protected abstract LiveData<CacheObject> loadFromDb();
 
     // Called to create the API call.
-    @NonNull
-    @MainThread
+    @NonNull @MainThread
     protected abstract LiveData<ApiResponse<RequestObject>> createCall();
 
     // Returns a LiveData object that represents the resource that's implemented
     // in the base class.
-    public final LiveData<Resource<CacheObject>> getAsLiveData() {
+    public final LiveData<Resource<CacheObject>> getAsLiveData(){
         return results;
-    }
-
-    ;
+    };
 }
+
+
+
+
+
 
 
 

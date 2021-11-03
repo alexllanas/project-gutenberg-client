@@ -20,6 +20,8 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private static final int LOADING_TYPE = 1;
     private static final int CATEGORY_TYPE = 2;
+    private static final int BOOK_TYPE = 3;
+    private static final int EXHAUSTED_TYPE = 4;
 
     private List<Book> mBooks;
     private OnBookListener mOnBookListener;
@@ -36,17 +38,18 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         View view = null;
 
         switch (viewType) {
-            case CATEGORY_TYPE: {
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_category_list_item, parent, false);
-                return new CategoryViewHolder(view, mOnBookListener, requestManager);
-            }
             case LOADING_TYPE: {
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_loading_list_item, parent, false);
                 return new LoadingViewHolder(view);
             }
+            case BOOK_TYPE: {
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_book_list_item, parent, false);
+                return new BookViewHolder(view, mOnBookListener, requestManager);
+            }
         }
 
-        return null;
+        view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_category_list_item, parent, false);
+        return new CategoryViewHolder(view, mOnBookListener, requestManager);
     }
 
     @Override
@@ -55,6 +58,8 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         if (itemViewType == CATEGORY_TYPE) {
             ((CategoryViewHolder) holder).onBind(mBooks.get(position));
+        } else if (itemViewType == BOOK_TYPE) {
+            ((BookViewHolder) holder).onBind(mBooks.get(position));
         }
     }
 
@@ -68,10 +73,24 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public int getItemViewType(int position) {
-        if(mBooks.get(position).getBook_id() == -1) {
+        if (mBooks.get(position).getBook_id() == -1) {
             return CATEGORY_TYPE;
+        } else if (mBooks.get(position).getTitle().equals("LOADING")) {
+            return LOADING_TYPE;
+        } else if (mBooks.get(position).getTitle().equals("EXHAUSTED")) {
+            return EXHAUSTED_TYPE;
+        } else {
+            return BOOK_TYPE;
         }
-        return 0;
+    }
+
+    public Book getSelectedBook(int position) {
+        if (mBooks != null) {
+            if (mBooks.size() > 0) {
+                return mBooks.get(position);
+            }
+        }
+        return null;
     }
 
     public void displayBookCategories() {
@@ -86,6 +105,70 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             categories.add(book);
         }
         mBooks = categories;
+        notifyDataSetChanged();
+    }
+
+    public void displayOnlyLoading() {
+        clearBooksList();
+        Book book = new Book();
+        book.setTitle("LOADING");
+        mBooks.add(book);
+        notifyDataSetChanged();
+    }
+
+    public void displayLoading() {
+        if (mBooks == null)
+            mBooks = new ArrayList<>();
+        if (!isLoading()) {
+            Book book = new Book();
+            book.setTitle("LOADING");
+            mBooks.add(book);
+            notifyDataSetChanged();
+        }
+    }
+
+    public void hideLoading() {
+        if (isLoading()) {
+            if (mBooks.get(0).getTitle().equals("LOADING")) {
+                mBooks.remove(0);
+            } else if (mBooks.get(mBooks.size() - 1).equals("LOADING")) {
+                mBooks.remove(mBooks.size() - 1);
+            }
+            notifyDataSetChanged();
+        }
+    }
+
+    private boolean isLoading() {
+        if (mBooks != null) {
+            if (mBooks.size() > 0) {
+                if (mBooks.get(mBooks.size() - 1).getTitle().equals("LOADING")) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void clearBooksList() {
+        if (mBooks == null) {
+            mBooks = new ArrayList<>();
+        } else {
+            mBooks.clear();
+        }
+        notifyDataSetChanged();
+    }
+
+
+    public void setBooks(List<Book> books) {
+        mBooks = books;
+        notifyDataSetChanged();
+    }
+
+    public void setQueryExhausted() {
+        hideLoading();
+        Book exhaustedBook = new Book();
+        exhaustedBook.setTitle("EXHAUSTED");
+        mBooks.add(exhaustedBook);
         notifyDataSetChanged();
     }
 }

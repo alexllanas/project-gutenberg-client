@@ -12,6 +12,7 @@ import retrofit2.Call;
 import retrofit2.CallAdapter;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 public class LiveDataCallAdapter<R> implements CallAdapter<R, LiveData<ApiResponse<R>>> {
 
@@ -44,6 +45,7 @@ public class LiveDataCallAdapter<R> implements CallAdapter<R, LiveData<ApiRespon
 
                         @Override
                         public void onFailure(@NonNull Call<R> call, @NonNull Throwable t) {
+                            Timber.d(t);
                             postValue(apiResponse.create(t));
                         }
                     });

@@ -1,7 +1,9 @@
-package com.example.simplebookwormapp;
+package com.example.simplebookwormapp.ui;
 
 import android.app.Application;
 import android.os.Build;
+
+import com.example.simplebookwormapp.BuildConfig;
 
 import timber.log.Timber;
 

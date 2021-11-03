@@ -15,4 +15,11 @@ public interface BookApi {
         @Query("search") String query,
         @Query("page") String page
     );
+
+    @GET("books")
+    LiveData<ApiResponse<BookSearchResponse>> searchTopic(
+            @Query("topic") String topic,
+            @Query("page") String page
+    );
+
 }

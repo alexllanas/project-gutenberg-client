@@ -33,7 +33,7 @@ public class RetrofitService {
     private static Retrofit.Builder retrofitBuilder =
             new Retrofit.Builder()
                     .baseUrl(Constants.BASE_URL)
-                    .client(client)
+//                    .client(client)
                     .addCallAdapterFactory(new LiveDataCallAdapterFactory())
                     .addConverterFactory(GsonConverterFactory.create());
 
