@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 import retrofit2.Response;
+import timber.log.Timber;
 
 public class ApiResponse<T> {
 
@@ -12,13 +13,14 @@ public class ApiResponse<T> {
     }
 
     public ApiResponse<T> create(Response<T> response) {
+        Timber.d("Response code: " + response.code());
+        Timber.d("Response successful: " + response.isSuccessful());
 
         if (response.isSuccessful()) {
             T body = response.body();
-
             if (body instanceof BookSearchResponse) {
                 if (((BookSearchResponse) body).getCount() == 0) {
-                    // query is exhausted
+                    // query has no results
                     return new ApiErrorResponse<>("No more results.");
                 }
             }
@@ -30,12 +32,17 @@ public class ApiResponse<T> {
             }
         } else {
             String errorMsg = "";
-            try {
-                assert response.errorBody() != null;
-                errorMsg = response.errorBody().string();
-            } catch (IOException e) {
-                e.printStackTrace();
-                errorMsg = response.message();
+            if (response.code() == 404) {
+                // pagination exhausted
+                errorMsg = "No more results.";
+            } else {
+                try {
+                    assert response.errorBody() != null;
+                    errorMsg = response.errorBody().string();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    errorMsg = response.message();
+                }
             }
             return new ApiErrorResponse<>(errorMsg);
         }

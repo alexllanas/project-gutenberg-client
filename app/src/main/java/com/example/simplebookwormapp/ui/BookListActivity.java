@@ -89,7 +89,8 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
             case SUCCESS: {
                 mAdapter.hideLoading();
 
-                Timber.d("books count: " + listResource.data.get(0).getTitle());
+                assert listResource.data != null;
+                Timber.d("books count: %s", listResource.data.get(0).getTitle());
                 mAdapter.setBooks(listResource.data);
                 break;
             }

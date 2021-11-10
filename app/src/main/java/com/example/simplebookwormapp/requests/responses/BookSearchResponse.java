@@ -18,6 +18,11 @@ public class BookSearchResponse {
     @Expose()
     private List<Book> books;
 
+    @SerializedName("detail")
+    @Expose()
+    private String error;
+
+
     public int getCount() {
         return count;
     }
@@ -28,4 +33,7 @@ public class BookSearchResponse {
     }
 
 
+    public String getError() {
+        return error;
+    }
 }
