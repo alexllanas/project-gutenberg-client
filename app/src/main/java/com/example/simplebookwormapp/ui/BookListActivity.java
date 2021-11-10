@@ -46,9 +46,8 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
         initRecyclerView();
         initSearchView();
         subscribeObservers();
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        setSupportActionBar(findViewById(R.id.toolbar));
     }
-
 
     private void subscribeObservers() {
         mBookListViewModel.getBooks().observe(this, listResource -> {
@@ -88,6 +87,8 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
             }
             case SUCCESS: {
                 mAdapter.hideLoading();
+
+                Timber.d("books count: " + listResource.data.get(0).getTitle());
                 mAdapter.setBooks(listResource.data);
                 break;
             }
@@ -95,7 +96,7 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
     }
 
     private void processErrorResource(Resource<List<Book>> listResource) {
-        Timber.d("hello");
+        Timber.d("blah: %s", listResource.message);
         mAdapter.hideLoading();
         mAdapter.setBooks(listResource.data);
         Toast.makeText(BookListActivity.this, listResource.message, Toast.LENGTH_SHORT).show();

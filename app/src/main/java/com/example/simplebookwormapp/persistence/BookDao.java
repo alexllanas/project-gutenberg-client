@@ -26,10 +26,10 @@ public interface BookDao {
     @Insert(onConflict = REPLACE)
     void insertBook(Book book);
 
-    @Query("UPDATE books SET title = :title, authors = :authors, formats = :formats, subjects = :subjects WHERE book_id =:book_id")
-    void updateBook(long book_id, String title, List<Author> authors, Formats formats, String[] subjects);
+    @Query("UPDATE books SET title = :title, authors = :authors, formats = :formats, subjects = :subjects WHERE book_id = :book_id")
+    void updateBook(long book_id, String title, List<Author> authors, Formats formats, ArrayList<String> subjects);
 
-    @Query("SELECT * FROM books WHERE title LIKE '%' || :query || '%' OR subjects LIKE '%' || :query || '%' " +
+    @Query("SELECT * FROM books WHERE title LIKE '%' || :query || '%' OR subjects LIKE '%' || :query || '%' OR authors LIKE '%' || :query || '%'" +
             "ORDER BY title DESC LIMIT (:pageNumber * 30)")
     LiveData<List<Book>> searchBooks(String query, int pageNumber);
 

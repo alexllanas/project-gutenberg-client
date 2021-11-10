@@ -1,5 +1,7 @@
 package com.example.simplebookwormapp.adapters;
 
+import static java.util.List.*;
+
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -12,6 +14,7 @@ import com.example.simplebookwormapp.models.Author;
 import com.example.simplebookwormapp.models.Book;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BookViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -35,15 +38,26 @@ public class BookViewHolder extends RecyclerView.ViewHolder implements View.OnCl
     public void onBind(Book book) {
         if (book != null) {
             if (book.getFormats() != null) {
-                requestManager
-                        .load(book.getFormats().getImage_jpeg())
-                        .into(image);
+                setMediumImage(book);
             }
             title.setText(book.getTitle());
+//            author.setText(book.getAuthors().get(0).getName());
             if (book.getAuthors() != null)
                 setAuthorsText(book);
         }
 
+    }
+
+    private void setMediumImage(Book book) {
+        String imageUrl = book.getFormats().getImage_jpeg();
+        if (imageUrl != null) {
+            if (imageUrl.contains("small")) {
+                imageUrl = imageUrl.replace("small", "medium");
+            }
+            requestManager
+                    .load(imageUrl)
+                    .into(image);
+        }
     }
 
     private void setAuthorsText(Book book) {
@@ -51,9 +65,9 @@ public class BookViewHolder extends RecyclerView.ViewHolder implements View.OnCl
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < authors.size(); i++) {
             if (i == authors.size() - 1) {
-                sb.append(authors.get(i));
+                sb.append(authors.get(i).getName());
             } else {
-                sb.append(authors.get(i) + "; ");
+                sb.append(authors.get(i).getName() + "; ");
             }
         }
         author.setText(sb);

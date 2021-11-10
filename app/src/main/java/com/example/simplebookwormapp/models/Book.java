@@ -10,6 +10,8 @@ import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity(tableName = "books")
@@ -19,6 +21,7 @@ public class Book implements Parcelable {
      * Class fields
      */
 
+    @SerializedName("id")
     @PrimaryKey
     @NonNull
     private long book_id;
@@ -34,14 +37,13 @@ public class Book implements Parcelable {
     private List<Author> authors;
 
     @ColumnInfo(name = "subjects")
-    private String[] subjects;
+    private ArrayList<String> subjects;
 
     @ColumnInfo(name = "formats")
     private Formats formats;
 
     @ColumnInfo(name = "timestamp")
-    private int timestamp;
-
+    private long timestamp;
 
     /**
      * Class constructors
@@ -63,15 +65,14 @@ public class Book implements Parcelable {
      * @param formats
      * @param timestamp
      */
-    public Book(long book_id, String title, List<Author> authors, String[] subjects, Formats formats, int timestamp) {
+    public Book(long book_id, String title, List<Author> authors, ArrayList<String> subjects, Formats formats) {
         this.book_id = book_id;
         this.title = title;
         this.authors = authors;
         this.subjects = subjects;
         this.formats = formats;
-        this.timestamp = timestamp;
+        this.timestamp = new Date().getTime();
     }
-
 
     /**
      * Getters and setters
@@ -101,15 +102,15 @@ public class Book implements Parcelable {
         this.authors = authors;
     }
 
-    public String[] getSubjects() {
+    public ArrayList<String> getSubjects() {
         return subjects;
     }
 
-    public void setSubjects(String[] subjects) {
+    public void setSubjects(ArrayList<String> subjects) {
         this.subjects = subjects;
     }
 
-    public int getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
@@ -157,5 +158,6 @@ public class Book implements Parcelable {
         parcel.writeString(title);
         parcel.writeList(authors);
         parcel.writeParcelable(formats, i);
+        parcel.writeLong(timestamp);
     }
 }

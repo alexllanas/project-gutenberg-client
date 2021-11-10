@@ -52,10 +52,10 @@ public class BookRepository {
             @Override
             protected void saveCallResult(@NonNull BookSearchResponse item) {
                 if (item.getBooks() != null) {
-                    for (Book book:
-                         item.getBooks()) {
-                        Timber.d(book.getTitle() + " - " + book.getAuthors().get(0).getName());
-                    }
+//                    for (Book book:
+//                         item.getBooks()) {
+//                        Timber.d(book.getTitle() + " - " + book.getAuthors().get(0).getName());
+//                    }
                     saveResponse(item);
                 }
             }
@@ -92,17 +92,18 @@ public class BookRepository {
         Book[] books = new Book[item.getBooks().size()];
 
         int index = 0;
-        for (long rowId : bookDao.insertBooks((Book[]) (item.getBooks().toArray(books)))) {
+        for (long rowId : bookDao.insertBooks(item.getBooks().toArray(books))) {
             if (rowId == -1) {
                 Timber.d("saveCallResult: CONFLICT... This book is already in the cache");
+                Timber.d(books[index].getTitle());
                 // If book already exists do not insert because timestamp will be overwritten.
-//                bookDao.updateBook(
-//                        books[index].getBook_id(),
-//                        books[index].getTitle(),
-//                        books[index].getAuthors(),
-//                        books[index].getFormats(),
-//                        books[index].getSubjects()
-//                );
+                bookDao.updateBook(
+                        books[index].getBook_id(),
+                        books[index].getTitle(),
+                        books[index].getAuthors(),
+                        books[index].getFormats(),
+                        books[index].getSubjects()
+                );
             }
             index++;
         }
