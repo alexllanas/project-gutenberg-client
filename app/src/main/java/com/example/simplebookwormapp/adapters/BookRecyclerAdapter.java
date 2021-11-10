@@ -1,22 +1,29 @@
 package com.example.simplebookwormapp.adapters;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.ListPreloader;
+import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.util.ViewPreloadSizeProvider;
 import com.example.simplebookwormapp.R;
 import com.example.simplebookwormapp.models.Book;
 import com.example.simplebookwormapp.models.Formats;
 import com.example.simplebookwormapp.util.Constants;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
-public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ListPreloader.PreloadModelProvider<String> {
 
     private static final int LOADING_TYPE = 1;
     private static final int CATEGORY_TYPE = 2;
@@ -26,10 +33,12 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private List<Book> mBooks;
     private OnBookListener mOnBookListener;
     private final RequestManager requestManager;
+    private final ViewPreloadSizeProvider<String> viewPreloadSizeProvider;
 
-    public BookRecyclerAdapter(OnBookListener onBookListener, RequestManager requestManager) {
+    public BookRecyclerAdapter(OnBookListener onBookListener, RequestManager requestManager, ViewPreloadSizeProvider<String> viewPreloadSizeProvider) {
         this.mOnBookListener = onBookListener;
         this.requestManager = requestManager;
+        this.viewPreloadSizeProvider = viewPreloadSizeProvider;
     }
 
     @NonNull
@@ -44,7 +53,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             }
             case BOOK_TYPE: {
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_book_list_item, parent, false);
-                return new BookViewHolder(view, mOnBookListener, requestManager);
+                return new BookViewHolder(view, mOnBookListener, requestManager, viewPreloadSizeProvider);
             }
             case EXHAUSTED_TYPE: {
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_exhausted_list_item, parent, false);
@@ -174,5 +183,24 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         exhaustedBook.setTitle("EXHAUSTED");
         mBooks.add(exhaustedBook);
         notifyDataSetChanged();
+    }
+
+    @NonNull
+    @Override
+    public List<String> getPreloadItems(int position) {
+        String url = "";
+        if (mBooks.get(position).getFormats() != null) {
+            url = mBooks.get(position).getFormats().getImage_jpeg();
+            if (url == null || TextUtils.isEmpty(url)) {
+                return Collections.emptyList();
+            }
+        }
+        return Collections.singletonList(url);
+    }
+
+    @Nullable
+    @Override
+    public RequestBuilder<?> getPreloadRequestBuilder(@NonNull String item) {
+        return requestManager.load(item);
     }
 }

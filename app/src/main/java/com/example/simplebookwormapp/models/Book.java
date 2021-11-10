@@ -1,8 +1,10 @@
 package com.example.simplebookwormapp.models;
 
+import android.net.Uri;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -10,7 +12,6 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
@@ -77,6 +78,16 @@ public class Book implements Parcelable {
         this.timestamp = new Date().getTime();
     }
 
+    private String resizeImageUrl(Formats formats) {
+        String imageUrl = formats.getImage_jpeg();
+        if (imageUrl != null) {
+            if (imageUrl.contains("small")) {
+                imageUrl = imageUrl.replace("small", "medium");
+            }
+        }
+        return imageUrl;
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     private List<Author> reorderedAuthorNames(List<Author> authors) {
         ArrayList<Author> reordered = (ArrayList<Author>) authors;
@@ -141,6 +152,13 @@ public class Book implements Parcelable {
     }
 
     public void setFormats(Formats formats) {
+        String resizedImageUrl = resizeImageUrl(formats);
+        if (resizedImageUrl == null || TextUtils.isEmpty(resizedImageUrl)) {
+//            resizedImageUrl = "android.resource://com.example.simplebookwormapp/drawable/white_background.png";
+            resizedImageUrl = "https://via.placeholder.com/150";
+
+        }
+        formats.setImage_jpeg(resizedImageUrl);
         this.formats = formats;
     }
 

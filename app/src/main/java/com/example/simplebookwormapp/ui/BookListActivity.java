@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
@@ -12,8 +13,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.ListPreloader;
 import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.util.ViewPreloadSizeProvider;
 import com.example.simplebookwormapp.BuildConfig;
 import com.example.simplebookwormapp.R;
 import com.example.simplebookwormapp.adapters.BookRecyclerAdapter;
@@ -139,10 +147,19 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
 
 
     private void initRecyclerView() {
-        mAdapter = new BookRecyclerAdapter(this, initGlide());
+        ViewPreloadSizeProvider<String> viewPreloadSizeProvider = new ViewPreloadSizeProvider<>();
+
+        mAdapter = new BookRecyclerAdapter(this, initGlide(), viewPreloadSizeProvider);
         VerticalSpacingItemDecoration itemDecoration = new VerticalSpacingItemDecoration(30);
         mRecyclerView.addItemDecoration(itemDecoration);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        RecyclerViewPreloader<String> preloader = new RecyclerViewPreloader<String>(
+                Glide.with(this),
+                (ListPreloader.PreloadModelProvider<String>) mAdapter,
+                viewPreloadSizeProvider,
+                30);
+        mRecyclerView.addOnScrollListener(preloader);
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override

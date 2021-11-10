@@ -1,32 +1,40 @@
 package com.example.simplebookwormapp.adapters;
 
-import static java.util.List.*;
-
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.util.ViewPreloadSizeProvider;
 import com.example.simplebookwormapp.R;
 import com.example.simplebookwormapp.models.Author;
 import com.example.simplebookwormapp.models.Book;
 
 import java.util.ArrayList;
-import java.util.List;
+
+import timber.log.Timber;
 
 public class BookViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     private final RequestManager requestManager;
+    private final ViewPreloadSizeProvider viewPreloadSizeProvider;
     private final OnBookListener onBookListener;
     TextView title, author;
     ImageView image;
 
-    public BookViewHolder(View itemView, OnBookListener onBookListener, RequestManager requestManager) {
+    public BookViewHolder(View itemView, OnBookListener onBookListener, RequestManager requestManager, ViewPreloadSizeProvider viewPreloadSizeProvider) {
         super(itemView);
 
         this.requestManager = requestManager;
+        this.viewPreloadSizeProvider = viewPreloadSizeProvider;
         this.onBookListener = onBookListener;
 
         title = itemView.findViewById(R.id.book_title);
@@ -38,24 +46,39 @@ public class BookViewHolder extends RecyclerView.ViewHolder implements View.OnCl
     public void onBind(Book book) {
         if (book != null) {
             if (book.getFormats() != null) {
-                setMediumImage(book);
+                setImage(book);
             }
+
             title.setText(book.getTitle());
-//            author.setText(book.getAuthors().get(0).getName());
             if (book.getAuthors() != null)
                 setAuthorsText(book);
         }
-
+        viewPreloadSizeProvider.setView(image);
     }
 
-    private void setMediumImage(Book book) {
+    private void setImage(Book book) {
         String imageUrl = book.getFormats().getImage_jpeg();
+        Timber.d("-\nTitle: " + book.getTitle() + "\nImage null? " + (imageUrl == null) + "\nImage URL: " + imageUrl);
         if (imageUrl != null) {
-            if (imageUrl.contains("small")) {
-                imageUrl = imageUrl.replace("small", "medium");
-            }
+            String finalImageUrl = imageUrl;
+            Timber.e("LOADING IMAGE URL ----> " + imageUrl);
             requestManager
                     .load(imageUrl)
+                    .timeout(6000)
+                    .listener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                            Timber.e(e);
+                            Timber.e("BAD URL: " + finalImageUrl);
+                            e.logRootCauses("bookviewholder");
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                            return false;
+                        }
+                    })
                     .into(image);
         }
     }
