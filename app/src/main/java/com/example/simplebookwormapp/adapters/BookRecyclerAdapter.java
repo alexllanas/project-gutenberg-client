@@ -46,6 +46,10 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_book_list_item, parent, false);
                 return new BookViewHolder(view, mOnBookListener, requestManager);
             }
+            case EXHAUSTED_TYPE: {
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_exhausted_list_item, parent, false);
+                return new ExhaustedViewHolder(view);
+            }
         }
 
         view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_category_list_item, parent, false);

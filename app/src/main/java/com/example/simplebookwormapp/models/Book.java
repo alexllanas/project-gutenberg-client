@@ -1,18 +1,23 @@
 package com.example.simplebookwormapp.models;
 
+import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import timber.log.Timber;
 
 @Entity(tableName = "books")
 public class Book implements Parcelable {
@@ -28,9 +33,6 @@ public class Book implements Parcelable {
 
     @ColumnInfo(name = "title")
     private String title;
-
-//    @ColumnInfo(name = "authors")
-//    private ArrayList<String> authorsArray;
 
     @SerializedName("authors")
     @ColumnInfo(name = "authors")
@@ -65,6 +67,7 @@ public class Book implements Parcelable {
      * @param formats
      * @param timestamp
      */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public Book(long book_id, String title, List<Author> authors, ArrayList<String> subjects, Formats formats) {
         this.book_id = book_id;
         this.title = title;
@@ -72,6 +75,20 @@ public class Book implements Parcelable {
         this.subjects = subjects;
         this.formats = formats;
         this.timestamp = new Date().getTime();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private List<Author> reorderedAuthorNames(List<Author> authors) {
+        ArrayList<Author> reordered = (ArrayList<Author>) authors;
+
+        reordered.forEach(author -> {
+            Timber.d(author.getName());
+            String[] firstLast = author.getName().split(",");
+            if (firstLast.length == 2) {
+                author.setName(firstLast[1] + " " + firstLast[0]);
+            }
+        });
+        return reordered;
     }
 
     /**
@@ -98,8 +115,9 @@ public class Book implements Parcelable {
         return authors;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void setAuthors(List<Author> authors) {
-        this.authors = authors;
+        this.authors = reorderedAuthorNames(authors);
     }
 
     public ArrayList<String> getSubjects() {

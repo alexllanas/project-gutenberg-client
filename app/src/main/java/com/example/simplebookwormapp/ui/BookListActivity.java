@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.simplebookwormapp.BuildConfig;
 import com.example.simplebookwormapp.R;
 import com.example.simplebookwormapp.adapters.BookRecyclerAdapter;
 import com.example.simplebookwormapp.adapters.OnBookListener;
@@ -99,7 +100,10 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
         Timber.d("blah: %s", listResource.message);
         mAdapter.hideLoading();
         mAdapter.setBooks(listResource.data);
-        Toast.makeText(BookListActivity.this, listResource.message, Toast.LENGTH_SHORT).show();
+
+        if (BuildConfig.DEBUG) {
+            Toast.makeText(BookListActivity.this, listResource.message, Toast.LENGTH_SHORT).show();
+        }
 
         if (listResource.message.equals(Constants.QUERY_EXHAUSTED)) {
             mAdapter.setQueryExhausted();

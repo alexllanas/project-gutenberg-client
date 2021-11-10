@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">SimpleBookWormApp</string>
     <string name="dummy_string">category</string>
+    <string name="exhausted_results">No more results...</string>
 </resources>
