@@ -3,10 +3,14 @@ package com.example.simplebookwormapp.requests;
 import androidx.lifecycle.LiveData;
 
 import com.example.simplebookwormapp.requests.responses.ApiResponse;
+import com.example.simplebookwormapp.requests.responses.BookContentResponse;
 import com.example.simplebookwormapp.requests.responses.BookSearchResponse;
 
+import okhttp3.ResponseBody;
+import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
+import retrofit2.http.Url;
 
 public interface BookApi {
 
@@ -22,4 +26,6 @@ public interface BookApi {
             @Query("page") String page
     );
 
+    @GET
+    LiveData<ApiResponse<ResponseBody>> searchBookContent(@Url String url);
 }

@@ -41,6 +41,7 @@ public class BookViewHolder extends RecyclerView.ViewHolder implements View.OnCl
         author = itemView.findViewById(R.id.book_author);
         image = itemView.findViewById(R.id.book_image);
 
+        itemView.setOnClickListener(this);
     }
 
     public void onBind(Book book) {
@@ -58,7 +59,6 @@ public class BookViewHolder extends RecyclerView.ViewHolder implements View.OnCl
 
     private void setImage(Book book) {
         String imageUrl = book.getFormats().getImage_jpeg();
-        Timber.d("-\nTitle: " + book.getTitle() + "\nImage null? " + (imageUrl == null) + "\nImage URL: " + imageUrl);
         if (imageUrl != null) {
             String finalImageUrl = imageUrl;
             Timber.e("LOADING IMAGE URL ----> " + imageUrl);

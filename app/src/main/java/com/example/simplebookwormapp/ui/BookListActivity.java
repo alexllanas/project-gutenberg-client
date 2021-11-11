@@ -27,12 +27,14 @@ import com.example.simplebookwormapp.R;
 import com.example.simplebookwormapp.adapters.BookRecyclerAdapter;
 import com.example.simplebookwormapp.adapters.OnBookListener;
 import com.example.simplebookwormapp.models.Book;
+import com.example.simplebookwormapp.models.Formats;
 import com.example.simplebookwormapp.util.Constants;
 import com.example.simplebookwormapp.util.Resource;
 import com.example.simplebookwormapp.util.VerticalSpacingItemDecoration;
 import com.example.simplebookwormapp.viewmodels.BookListViewModel;
 
 import java.util.List;
+import java.util.Objects;
 
 import timber.log.Timber;
 
@@ -156,9 +158,9 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
 
         RecyclerViewPreloader<String> preloader = new RecyclerViewPreloader<String>(
                 Glide.with(this),
-                (ListPreloader.PreloadModelProvider<String>) mAdapter,
+                mAdapter,
                 viewPreloadSizeProvider,
-                30);
+                32);
         mRecyclerView.addOnScrollListener(preloader);
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -193,8 +195,18 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
     @Override
     public void onBookClick(int position) {
         Intent intent = new Intent(this, BookActivity.class);
-        intent.putExtra("book", mAdapter.getSelectedBook(position));
-        startActivity(intent);
+        if (mAdapter.getSelectedBook(position) != null) {
+            Book book = mAdapter.getSelectedBook(position);
+            if (book != null) {
+                Formats formats = book.getFormats();
+                if (formats != null) {
+                    if (formats.getText_plain_utf_8() != null) {
+                        intent.putExtra("url", formats.getText_plain_utf_8());
+                        startActivity(intent);
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -205,7 +217,7 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
 
     @Override
     public void onBackPressed() {
-        Timber.d(mBookListViewModel.getViewState().getValue().toString());
+        Timber.d(Objects.requireNonNull(mBookListViewModel.getViewState().getValue()).toString());
         if (mBookListViewModel.getViewState().getValue() == BookListViewModel.ViewState.CATEGORIES)
             super.onBackPressed();
         else {

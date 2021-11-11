@@ -1,11 +1,14 @@
 package com.example.simplebookwormapp.repositories;
 
 import android.content.Context;
+import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 
+import com.example.simplebookwormapp.requests.responses.BookContentResponse;
 import com.example.simplebookwormapp.util.AppExecutors;
 import com.example.simplebookwormapp.models.Book;
 import com.example.simplebookwormapp.persistence.BookDao;
@@ -18,6 +21,10 @@ import com.example.simplebookwormapp.util.Resource;
 
 import java.util.List;
 
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import timber.log.Timber;
 
 public class BookRepository {
@@ -36,6 +43,33 @@ public class BookRepository {
         bookDao = BookDatabase.getInstance(context).getBookDao();
     }
 
+    public LiveData<Resource<String>> searchBookContent(final String url) {
+        return new NetworkBoundResource<String, ResponseBody>(AppExecutors.getInstance()) {
+            @Override
+            protected void saveCallResult(@NonNull ResponseBody item) {
+
+            }
+
+            @Override
+            protected boolean shouldFetch(@Nullable String data) {
+                return true;
+            }
+
+            @NonNull
+            @Override
+            protected LiveData<String> loadFromDb() {
+                return new MediatorLiveData<>();
+            }
+
+            @NonNull
+            @Override
+            protected LiveData<ApiResponse<ResponseBody>> createCall() {
+                Timber.d("");
+                return RetrofitService.getBookApi().searchBookContent(url);
+            }
+        }.getAsLiveData();
+    }
+
     /**
      * Query local cache for book query, if not present, fetch from network and then save to cache.
      * <p>
@@ -52,10 +86,6 @@ public class BookRepository {
             @Override
             protected void saveCallResult(@NonNull BookSearchResponse item) {
                 if (item.getBooks() != null) {
-//                    for (Book book:
-//                         item.getBooks()) {
-//                        Timber.d(book.getTitle() + " - " + book.getAuthors().get(0).getName());
-//                    }
                     saveResponse(item);
                 }
             }
@@ -75,8 +105,6 @@ public class BookRepository {
             @NonNull
             @Override
             protected LiveData<ApiResponse<BookSearchResponse>> createCall() {
-                Timber.d("in createCall");
-
                 if (searchTopic) {
                     Timber.d("query: " + query + " page number=" + pageNumber + " searchtopic=" + searchTopic);
                     return RetrofitService.getBookApi().searchTopic(query, String.valueOf(pageNumber));

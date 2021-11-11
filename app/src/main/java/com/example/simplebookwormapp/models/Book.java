@@ -56,6 +56,14 @@ public class Book implements Parcelable {
     }
 
     public Book(Parcel in) {
+        book_id = in.readLong();
+        title = in.readString();
+        authors = new ArrayList<>();
+        in.readList(authors, Book.class.getClassLoader());
+        subjects = new ArrayList<>();
+        in.readStringList(subjects);
+        formats = in.readParcelable(Book.class.getClassLoader());
+        timestamp = in.readLong();
     }
 
     /**
@@ -93,7 +101,6 @@ public class Book implements Parcelable {
         ArrayList<Author> reordered = (ArrayList<Author>) authors;
 
         reordered.forEach(author -> {
-            Timber.d(author.getName());
             String[] firstLast = author.getName().split(",");
             if (firstLast.length == 2) {
                 author.setName(firstLast[1] + " " + firstLast[0]);

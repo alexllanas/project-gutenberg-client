@@ -45,7 +45,6 @@ public class LiveDataCallAdapter<R> implements CallAdapter<R, LiveData<ApiRespon
 
                         @Override
                         public void onFailure(@NonNull Call<R> call, @NonNull Throwable t) {
-                            Timber.d(t);
                             postValue(apiResponse.create(t));
                         }
                     });

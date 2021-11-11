@@ -34,8 +34,6 @@ public class BookListViewModel extends AndroidViewModel {
     private boolean cancelRequest;
     private String query;
     private int pageNumber;
-    private long requestStartTime;
-
 
     public BookListViewModel(@NonNull Application application) {
         super(application);
@@ -116,8 +114,6 @@ public class BookListViewModel extends AndroidViewModel {
     }
 
     private void processSuccessOrError(LiveData<Resource<List<Book>>> repositorySource, Resource<List<Book>> listResource) {
-        Timber.d(listResource.status.toString());
-
         if (listResource.status == Resource.Status.SUCCESS) {
             Timber.d("Success");
             isPerformingQuery = false;
