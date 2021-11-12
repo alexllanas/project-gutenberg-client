@@ -15,7 +15,6 @@ import com.example.simplebookwormapp.models.Formats;
 import java.util.ArrayList;
 import java.util.List;
 
-import kotlin.jvm.JvmSuppressWildcards;
 
 @Dao
 public interface BookDao {

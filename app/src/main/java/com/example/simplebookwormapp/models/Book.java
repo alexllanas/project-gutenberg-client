@@ -26,7 +26,6 @@ public class Book implements Parcelable {
     /**
      * Class fields
      */
-
     @SerializedName("id")
     @PrimaryKey
     @NonNull

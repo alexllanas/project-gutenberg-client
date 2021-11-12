@@ -192,6 +192,11 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
                 .setDefaultRequestOptions(options);
     }
 
+    /**
+     * Can't send whole Book object with intent:
+     * As a workaround -- send URL and book ID as extras.
+     * @param position
+     */
     @Override
     public void onBookClick(int position) {
         Intent intent = new Intent(this, BookActivity.class);
@@ -202,6 +207,7 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
                 if (formats != null) {
                     if (formats.getText_plain_utf_8() != null) {
                         intent.putExtra("url", formats.getText_plain_utf_8());
+                        intent.putExtra("id", book.getBook_id());
                         startActivity(intent);
                     }
                 }

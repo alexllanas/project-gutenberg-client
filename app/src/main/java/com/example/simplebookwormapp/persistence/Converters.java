@@ -3,6 +3,7 @@ package com.example.simplebookwormapp.persistence;
 import androidx.room.TypeConverter;
 
 import com.example.simplebookwormapp.models.Author;
+import com.example.simplebookwormapp.models.ContentPath;
 import com.example.simplebookwormapp.models.Formats;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -17,55 +18,74 @@ public class Converters {
     public static String fromAuthorList(List<Author> authors) {
         Gson gson = new Gson();
         String json = gson.toJson(authors);
-        return json;
-    }
+        return json;    }
 
     @TypeConverter
     public static List<Author> toAuthorList(String authors) {
-        Type formatsType = new TypeToken<List<Author>>() {
+        Type entityType = new TypeToken<List<Author>>() {
         }.getType();
-        return new Gson().fromJson(authors, formatsType);
+        return new Gson().fromJson(authors, entityType);
+
     }
 
     @TypeConverter
     public static String fromStringArrayList(ArrayList<String> list) {
-        Gson gson = new Gson();
-        String json = gson.toJson(list);
-        return json;
+        return getJson(list);
     }
 
     @TypeConverter
-    public static ArrayList<String> toStringArrayList(String value) {
-        Type formatsType = new TypeToken<ArrayList<String>>() {
+    public static ArrayList<String> toStringArrayList(String json) {
+        Type entityType = new TypeToken<ArrayList<String>>() {
         }.getType();
-        return new Gson().fromJson(value, formatsType);
-    }
+        return new Gson().fromJson(json, entityType);    }
 
     @TypeConverter
     public static String fromFormats(Formats formats) {
-        Gson gson = new Gson();
-        String json = gson.toJson(formats);
-        return json;
+        return getJson(formats);
     }
 
     @TypeConverter
-    public static Formats toFormats(String value) {
-        Type formatsType = new TypeToken<Formats>() {
+    public static Formats toFormats(String json) {
+        Type entityType = new TypeToken<Formats>() {
         }.getType();
-        return new Gson().fromJson(value, formatsType);
-    }
+        return new Gson().fromJson(json, entityType);    }
 
     @TypeConverter
     public static String fromStringArray(String[] stringArray) {
-        Gson gson = new Gson();
-        String json = gson.toJson(stringArray);
-        return json;
+        return getJson(stringArray);
     }
 
     @TypeConverter
-    public static String[] toStringArray(String value) {
-        Type stringArrayType = new TypeToken<String[]>() {
+    public static String[] toStringArray(String json) {
+        Type entityType = new TypeToken<String[]>() {
         }.getType();
-        return new Gson().fromJson(value, stringArrayType);
+        return new Gson().fromJson(json, entityType);
+    }
+
+    /**
+     * ContentPath converters
+     */
+    public static String fromContentPath(ContentPath contentPath) {
+        return getJson(contentPath);
+    }
+
+    public static ContentPath toContentPath(String json) {
+        Type entityType = new TypeToken<ContentPath>() {
+        }.getType();
+        return new Gson().fromJson(json, entityType);
+    }
+
+
+    /**
+     * Get a JSON representation of an entity object as a String.
+     *
+     * @param entityObject
+     * @param <EntityObject>
+     * @return
+     */
+    public static <EntityObject> String getJson(EntityObject entityObject) {
+        Gson gson = new Gson();
+        String json = gson.toJson(entityObject);
+        return json;
     }
 }

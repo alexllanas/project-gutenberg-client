@@ -1,14 +1,14 @@
 package com.example.simplebookwormapp.repositories;
 
 import android.content.Context;
-import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 
-import com.example.simplebookwormapp.requests.responses.BookContentResponse;
+import com.example.simplebookwormapp.models.ContentPath;
+import com.example.simplebookwormapp.persistence.ContentPathDao;
 import com.example.simplebookwormapp.util.AppExecutors;
 import com.example.simplebookwormapp.models.Book;
 import com.example.simplebookwormapp.persistence.BookDao;
@@ -19,18 +19,18 @@ import com.example.simplebookwormapp.requests.responses.BookSearchResponse;
 import com.example.simplebookwormapp.util.NetworkBoundResource;
 import com.example.simplebookwormapp.util.Resource;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.List;
 
 import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import timber.log.Timber;
 
 public class BookRepository {
 
     private static BookRepository INSTANCE;
     private BookDao bookDao;
+    private ContentPathDao contentPathDao;
 
     public static BookRepository getInstance(Context context) {
         if (INSTANCE == null) {
@@ -41,33 +41,48 @@ public class BookRepository {
 
     private BookRepository(Context context) {
         bookDao = BookDatabase.getInstance(context).getBookDao();
+        contentPathDao = BookDatabase.getInstance(context).getContentPathDao();
     }
 
-    public LiveData<Resource<String>> searchBookContent(final String url) {
-        return new NetworkBoundResource<String, ResponseBody>(AppExecutors.getInstance()) {
+    public LiveData<Resource<ContentPath>> searchBookContent(final String url, long bookId, Context context) {
+        return new NetworkBoundResource<ContentPath, ResponseBody>(AppExecutors.getInstance()) {
             @Override
             protected void saveCallResult(@NonNull ResponseBody item) {
-
+                try {
+                    if (item.string() != null) {
+                        saveBookContentResponse(item, bookId, context);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
-            protected boolean shouldFetch(@Nullable String data) {
+            protected boolean shouldFetch(@Nullable ContentPath data) {
                 return true;
             }
 
             @NonNull
             @Override
-            protected LiveData<String> loadFromDb() {
-                return new MediatorLiveData<>();
+            protected LiveData<ContentPath> loadFromDb() {
+                return contentPathDao.getPath(bookId);
             }
 
             @NonNull
             @Override
             protected LiveData<ApiResponse<ResponseBody>> createCall() {
-                Timber.d("");
                 return RetrofitService.getBookApi().searchBookContent(url);
             }
         }.getAsLiveData();
+    }
+
+    private void saveBookContentResponse(ResponseBody item, long bookId, Context context) {
+        try {
+            writeToFile(item.string(), bookId, context);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**
@@ -86,7 +101,7 @@ public class BookRepository {
             @Override
             protected void saveCallResult(@NonNull BookSearchResponse item) {
                 if (item.getBooks() != null) {
-                    saveResponse(item);
+                    saveBookSearchResponse(item);
                 }
             }
 
@@ -116,7 +131,7 @@ public class BookRepository {
         }.getAsLiveData();
     }
 
-    private void saveResponse(@NonNull BookSearchResponse item) {
+    private void saveBookSearchResponse(@NonNull BookSearchResponse item) {
         Book[] books = new Book[item.getBooks().size()];
 
         int index = 0;
@@ -134,6 +149,22 @@ public class BookRepository {
                 );
             }
             index++;
+        }
+    }
+
+    private void writeToFile(String data, long bookId, Context context) {
+        try {
+            String path = context.getFilesDir().getAbsolutePath() + bookId + ".txt";
+            Timber.d(path);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(path, Context.MODE_PRIVATE));
+            outputStreamWriter.write(data);
+            outputStreamWriter.close();
+
+            ContentPath contentPath = new ContentPath(bookId, path);
+            contentPathDao.insertContentPath(contentPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Timber.e("An error occurred while writing data to file.");
         }
     }
 

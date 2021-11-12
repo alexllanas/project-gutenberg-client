@@ -9,8 +9,9 @@ import androidx.room.TypeConverter;
 import androidx.room.TypeConverters;
 
 import com.example.simplebookwormapp.models.Book;
+import com.example.simplebookwormapp.models.ContentPath;
 
-@Database(entities = {Book.class}, version = 1)
+@Database(entities = {Book.class, ContentPath.class}, version = 1)
 @TypeConverters({Converters.class})
 public abstract class BookDatabase extends RoomDatabase {
 
@@ -30,5 +31,7 @@ public abstract class BookDatabase extends RoomDatabase {
     }
 
     public abstract BookDao getBookDao();
+
+    public abstract  ContentPathDao getContentPathDao();
 
 }
