@@ -53,7 +53,7 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
         mSearchView = findViewById(R.id.search_view);
 
         mBookListViewModel = new ViewModelProvider(this).get(BookListViewModel.class);
-
+        
         initRecyclerView();
         initSearchView();
         subscribeObservers();
@@ -206,6 +206,7 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
                 Formats formats = book.getFormats();
                 if (formats != null) {
                     if (formats.getText_plain_utf_8() != null) {
+                        Timber.d(formats.getText_plain_utf_8());
                         intent.putExtra("url", formats.getText_plain_utf_8());
                         intent.putExtra("id", book.getBook_id());
                         startActivity(intent);

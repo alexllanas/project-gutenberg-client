@@ -46,7 +46,7 @@ public abstract class NetworkBoundResource<CacheObject, RequestObject> {
                     // get data from the network
                     fetchFromNetwork(dbSource);
                 }
-                else{
+                else {
                     results.addSource(dbSource, new Observer<CacheObject>() {
                         @Override
                         public void onChanged(@Nullable CacheObject cacheObject) {

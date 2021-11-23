@@ -1,5 +1,6 @@
 package com.example.simplebookwormapp.repositories;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
@@ -19,8 +20,11 @@ import com.example.simplebookwormapp.requests.responses.BookSearchResponse;
 import com.example.simplebookwormapp.util.NetworkBoundResource;
 import com.example.simplebookwormapp.util.Resource;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -49,9 +53,19 @@ public class BookRepository {
             @Override
             protected void saveCallResult(@NonNull ResponseBody item) {
                 try {
-                    if (item.string() != null) {
-                        saveBookContentResponse(item, bookId, context);
+                    Timber.d("BookID to save in DB: %d", bookId);
+                    Timber.d("in saveCallResult");
+                    Timber.d("item = %s", item);
+                    Timber.d("item.contentLength = %s", item.contentLength());
+                    Reader r = item.charStream();
+                    int intch;
+                    StringBuilder sb = new StringBuilder();
+                    while ((intch = r.read()) != -1) {
+                        char ch = (char) intch;
+                        sb.append(ch);
                     }
+//                    Timber.d("data = %s", sb.toString());
+                    saveBookContentResponse(sb.toString(), bookId, context);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -65,6 +79,7 @@ public class BookRepository {
             @NonNull
             @Override
             protected LiveData<ContentPath> loadFromDb() {
+                Timber.d("BookID to load from database: %d", bookId);
                 return contentPathDao.getPath(bookId);
             }
 
@@ -76,12 +91,8 @@ public class BookRepository {
         }.getAsLiveData();
     }
 
-    private void saveBookContentResponse(ResponseBody item, long bookId, Context context) {
-        try {
-            writeToFile(item.string(), bookId, context);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void saveBookContentResponse(String item, long bookId, Context context) {
+        writeToFile(item, bookId, context);
 
     }
 
@@ -153,19 +164,43 @@ public class BookRepository {
     }
 
     private void writeToFile(String data, long bookId, Context context) {
-        try {
-            String path = context.getFilesDir().getAbsolutePath() + bookId + ".txt";
-            Timber.d(path);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(path, Context.MODE_PRIVATE));
-            outputStreamWriter.write(data);
-            outputStreamWriter.close();
+        Timber.d("in writeToFile");
+        Timber.d(data);
 
-            ContentPath contentPath = new ContentPath(bookId, path);
-            contentPathDao.insertContentPath(contentPath);
+        String fileName = bookId + ".txt";
+        FileOutputStream fos = null;
+
+        try {
+            fos = context.openFileOutput(fileName, Context.MODE_PRIVATE);
+            fos.write(data.getBytes());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-            Timber.e("An error occurred while writing data to file.");
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
+
+
+//        try {
+//            String path = context.getFilesDir().getAbsolutePath() + bookId + ".txt";
+//            Timber.d(path);
+//            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(path, Context.MODE_PRIVATE));
+//            outputStreamWriter.write(data);
+//            outputStreamWriter.close();
+//
+//            ContentPath contentPath = new ContentPath(bookId, path);
+//            contentPathDao.insertContentPath(contentPath);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            Timber.e("An error occurred while writing data to file.");
+//        }
     }
 
 }

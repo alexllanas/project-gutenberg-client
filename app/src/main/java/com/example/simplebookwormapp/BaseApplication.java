@@ -1,9 +1,10 @@
-package com.example.simplebookwormapp.ui;
+package com.example.simplebookwormapp;
 
 import android.app.Application;
 import android.os.Build;
 
 import com.example.simplebookwormapp.BuildConfig;
+import com.example.simplebookwormapp.util.MyDebugTree;
 
 import timber.log.Timber;
 
@@ -12,7 +13,7 @@ public class BaseApplication extends Application {
     public void onCreate() {
         super.onCreate();
         if (BuildConfig.DEBUG) {
-            Timber.plant(new Timber.DebugTree());
+            Timber.plant(new MyDebugTree());
         }
     }
 }
