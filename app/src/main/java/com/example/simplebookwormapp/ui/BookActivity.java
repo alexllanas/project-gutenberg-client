@@ -84,6 +84,11 @@ public class BookActivity extends BaseActivity {
             String url = getIntent().getStringExtra("url");
             long book_id = getIntent().getLongExtra("id", -1);
             if (url != null || book_id != -1) {
+//                if (url.endsWith("zip")) {
+//                    Timber.d(url);
+//                    url = url.replace("zip", "txt");
+//                    Timber.d(url);
+//                }
                 mBookViewModel.searchBookContent(url, book_id, this);
             }
         }

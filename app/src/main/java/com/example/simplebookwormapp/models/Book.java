@@ -1,6 +1,5 @@
 package com.example.simplebookwormapp.models;
 
-import android.net.Uri;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -17,8 +16,6 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import timber.log.Timber;
 
 @Entity(tableName = "books")
 public class Book implements Parcelable {
@@ -85,14 +82,18 @@ public class Book implements Parcelable {
         this.timestamp = new Date().getTime();
     }
 
-    private String resizeImageUrl(Formats formats) {
-        String imageUrl = formats.getImage_jpeg();
+    private void resizeImageUrl(Formats format) {
+        String imageUrl = format.getImage_jpeg();
         if (imageUrl != null) {
             if (imageUrl.contains("small")) {
                 imageUrl = imageUrl.replace("small", "medium");
             }
         }
-        return imageUrl;
+        if (imageUrl == null || TextUtils.isEmpty(imageUrl)) {
+//            resizedImageUrl = "android.resource://com.example.simplebookwormapp/drawable/white_background.png";
+            imageUrl = "https://via.placeholder.com/150";
+        }
+        format.setImage_jpeg(imageUrl);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -157,15 +158,22 @@ public class Book implements Parcelable {
         return formats;
     }
 
-    public void setFormats(Formats formats) {
-        String resizedImageUrl = resizeImageUrl(formats);
-        if (resizedImageUrl == null || TextUtils.isEmpty(resizedImageUrl)) {
-//            resizedImageUrl = "android.resource://com.example.simplebookwormapp/drawable/white_background.png";
-            resizedImageUrl = "https://via.placeholder.com/150";
+    public void setFormats(Formats format) {
+        resizeImageUrl(format);
+        rectifyFilePrefixes(format);
 
+        this.formats = format;
+    }
+
+    private void rectifyFilePrefixes(Formats format) {
+        String ascii = format.getText_plain_ascii();
+        String utf8 = format.getText_plain_utf_8();
+        if (ascii != null && ascii.endsWith("zip")) {
+            format.setText_plain_ascii(ascii.replace("zip", "txt"));
         }
-        formats.setImage_jpeg(resizedImageUrl);
-        this.formats = formats;
+        if (utf8 != null && utf8.endsWith("zip")) {
+            format.setText_plain_utf_8(utf8.replace("zip", "txt"));
+        }
     }
 
 
