@@ -3,7 +3,6 @@ package com.example.simplebookwormapp.requests;
 import androidx.lifecycle.LiveData;
 
 import com.example.simplebookwormapp.requests.responses.ApiResponse;
-import com.example.simplebookwormapp.requests.responses.BookContentResponse;
 import com.example.simplebookwormapp.requests.responses.BookSearchResponse;
 
 import okhttp3.ResponseBody;

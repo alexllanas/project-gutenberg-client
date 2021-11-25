@@ -40,8 +40,6 @@ public class BookViewModel extends AndroidViewModel {
         bookContent.addSource(repositorySource, new Observer<Resource<ContentPath>>() {
             @Override
             public void onChanged(Resource<ContentPath> contentPathResource) {
-                Timber.d(String.valueOf(contentPathResource == null));
-                Timber.d(String.valueOf(null == contentPathResource.data));
                 processResource(repositorySource, contentPathResource);
             }
         });
@@ -63,11 +61,9 @@ public class BookViewModel extends AndroidViewModel {
 
     private void processSuccessOrError(LiveData<Resource<ContentPath>> repositorySource, Resource<ContentPath> contentPathResource) {
         if (contentPathResource.status == Resource.Status.SUCCESS) {
-            Timber.d("Success");
             isPerformingQuery = false;
             bookContent.removeSource(repositorySource);
         } else if (contentPathResource.status == Resource.Status.ERROR) {
-            Timber.d("Error");
             isPerformingQuery = false;
             bookContent.removeSource(repositorySource);
         }

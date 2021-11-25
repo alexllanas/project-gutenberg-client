@@ -34,5 +34,4 @@ public interface BookDao {
 
     @Query("SELECT * FROM books WHERE book_id = :book_id")
     LiveData<Book> getBook(long book_id);
-
 }

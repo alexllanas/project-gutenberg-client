@@ -53,7 +53,7 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
         mSearchView = findViewById(R.id.search_view);
 
         mBookListViewModel = new ViewModelProvider(this).get(BookListViewModel.class);
-        
+
         initRecyclerView();
         initSearchView();
         subscribeObservers();
@@ -63,8 +63,6 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
     private void subscribeObservers() {
         mBookListViewModel.getBooks().observe(this, listResource -> {
             if (listResource != null) {
-                Timber.d(listResource.status.toString());
-
                 if (listResource.data != null) {
                     processResourceByStatus(listResource);
                 }
@@ -98,9 +96,7 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
             }
             case SUCCESS: {
                 mAdapter.hideLoading();
-
                 assert listResource.data != null;
-                Timber.d("books count: %s", listResource.data.get(0).getTitle());
                 mAdapter.setBooks(listResource.data);
                 break;
             }
@@ -108,7 +104,6 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
     }
 
     private void processErrorResource(Resource<List<Book>> listResource) {
-        Timber.d("blah: %s", listResource.message);
         mAdapter.hideLoading();
         mAdapter.setBooks(listResource.data);
 
@@ -195,19 +190,26 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
     /**
      * Can't send whole Book object with intent:
      * As a workaround -- send URL and book ID as extras.
+     *
      * @param position
      */
     @Override
     public void onBookClick(int position) {
+
         Intent intent = new Intent(this, BookActivity.class);
         if (mAdapter.getSelectedBook(position) != null) {
             Book book = mAdapter.getSelectedBook(position);
             if (book != null) {
                 Formats formats = book.getFormats();
                 if (formats != null) {
+                    String url = null;
                     if (formats.getText_plain_utf_8() != null) {
-                        Timber.d(formats.getText_plain_utf_8());
-                        intent.putExtra("url", formats.getText_plain_utf_8());
+                        url = formats.getText_plain_utf_8();
+                    } else if (formats.getText_plain_ascii() != null) {
+                        url = formats.getText_plain_ascii();
+                    }
+                    if (url != null) {
+                        intent.putExtra("url", url);
                         intent.putExtra("id", book.getBook_id());
                         startActivity(intent);
                     }
@@ -218,13 +220,11 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
 
     @Override
     public void onCategoryClick(String category) {
-        Timber.d("%s has been clicked", category);
         searchBookApi(category, true);
     }
 
     @Override
     public void onBackPressed() {
-        Timber.d(Objects.requireNonNull(mBookListViewModel.getViewState().getValue()).toString());
         if (mBookListViewModel.getViewState().getValue() == BookListViewModel.ViewState.CATEGORIES)
             super.onBackPressed();
         else {

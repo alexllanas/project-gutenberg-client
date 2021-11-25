@@ -45,11 +45,7 @@ public class BookActivity extends BaseActivity {
             @Override
             public void onChanged(Resource<ContentPath> contentPathResource) {
                 if (contentPathResource != null) {
-                    Timber.d(contentPathResource.status.toString());
-                    Timber.i("content path resource data == null: %b", (contentPathResource.data == null));
-
                     if (contentPathResource.data != null) {
-                        Timber.d(contentPathResource.data.getPath());
                         processResourceByStatus(contentPathResource);
                     }
                 }
@@ -60,12 +56,10 @@ public class BookActivity extends BaseActivity {
     private void processResourceByStatus(Resource<ContentPath> contentPathResource) {
         switch (contentPathResource.status) {
             case LOADING: {
-                Timber.d("in LOADING");
                 showProgressBar(true);
                 break;
             }
             case ERROR: {
-                Timber.d("in ERROR");
                 showProgressBar(false);
                 if (BuildConfig.DEBUG) {
                     mBookContent.setText("No content.");
@@ -73,10 +67,8 @@ public class BookActivity extends BaseActivity {
                 break;
             }
             case SUCCESS: {
-                Timber.d("in SUCCESS");
                 showProgressBar(false);
-                String content = readFromFile(this, contentPathResource.data.getPath_id());
-                Timber.d("CONTENT= " + content);
+                String content = readFromFile(contentPathResource.data.getPath_id());
                 mBookContent.setText(content);
                 break;
             }
@@ -88,13 +80,12 @@ public class BookActivity extends BaseActivity {
             String url = getIntent().getStringExtra("url");
             long book_id = getIntent().getLongExtra("id", -1);
             if (url != null || book_id != -1) {
-                Timber.d(url);
                 mBookViewModel.searchBookContent(url, book_id, this);
             }
         }
     }
 
-    private String readFromFile(Context context, long book_id) {
+    private String readFromFile(long book_id) {
         FileInputStream fis = null;
         String filename = book_id + ".txt";
 
@@ -108,7 +99,6 @@ public class BookActivity extends BaseActivity {
             while ((text = br.readLine()) != null) {
                 sb.append(text).append("\n");
             }
-            Timber.d("in readFromFile");
             return sb.toString();
         } catch (IOException e) {
             e.printStackTrace();
@@ -121,32 +111,6 @@ public class BookActivity extends BaseActivity {
                 }
             }
         }
-
-
-//        String data = "";
-//
-//        Timber.d("READING FROM FILE");
-//        Timber.d(getFilesDir().toString());
-//        try {
-//            String path = getFilesDir().toString() + "/" + book_id + ".txt";
-//            InputStream inputStream = context.openFileInput(path);
-//            if (inputStream != null) {
-//                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-//                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-//                String output = "";
-//                StringBuilder stringBuilder = new StringBuilder();
-//
-//                while ((output = bufferedReader.readLine()) != null) {
-//                    stringBuilder.append("\n").append(output);
-//                }
-//                inputStream.close();
-//                data = stringBuilder.toString();
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            Timber.e("An error occurred reading from a file.");
-//        }
-//        return data;
         return "";
     }
 }

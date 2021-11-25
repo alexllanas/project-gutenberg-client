@@ -21,6 +21,20 @@ public class Formats implements Parcelable {
     @SerializedName("text/plain; charset=utf-8")
     private String text_plain_utf_8;
 
+    public String getText_plain_ascii() {
+        return text_plain_ascii;
+    }
+
+    public void setText_plain_ascii(String text_plain_ascii) {
+        this.text_plain_ascii = text_plain_ascii;
+    }
+
+    @SerializedName("text/plain; charset=us-ascii")
+    private String text_plain_ascii;
+
+
+
+
     public String getImage_jpeg() {
         return image_jpeg;
     }
@@ -89,6 +103,7 @@ public class Formats implements Parcelable {
         x_mobipocket_ebook = in.readString();
         zip = in.readString();
         text_plain_utf_8 = in.readString();
+        text_plain_ascii = in.readString();
     }
 
     public static final Creator<Formats> CREATOR = new Creator<Formats>() {
@@ -106,7 +121,7 @@ public class Formats implements Parcelable {
     public Formats() {
     }
 
-    public Formats(String image_jpeg, String epub_zip, String rdf_xml, String text_html_utf8, String x_mobipocket_ebook, String zip, String text_plain_utf_8) {
+    public Formats(String image_jpeg, String epub_zip, String rdf_xml, String text_html_utf8, String x_mobipocket_ebook, String zip, String text_plain_utf_8, String text_plain_ascii) {
         this.image_jpeg = image_jpeg;
         this.epub_zip = epub_zip;
         this.rdf_xml = rdf_xml;
@@ -114,6 +129,7 @@ public class Formats implements Parcelable {
         this.x_mobipocket_ebook = x_mobipocket_ebook;
         this.zip = zip;
         this.text_plain_utf_8 = text_plain_utf_8;
+        this.text_plain_ascii = text_plain_ascii;
     }
 
     @Override
@@ -130,5 +146,6 @@ public class Formats implements Parcelable {
         parcel.writeString(x_mobipocket_ebook);
         parcel.writeString(zip);
         parcel.writeString(text_plain_utf_8);
+        parcel.writeString(text_plain_ascii);
     }
 }

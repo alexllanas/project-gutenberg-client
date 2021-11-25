@@ -61,15 +61,12 @@ public class BookViewHolder extends RecyclerView.ViewHolder implements View.OnCl
         String imageUrl = book.getFormats().getImage_jpeg();
         if (imageUrl != null) {
             String finalImageUrl = imageUrl;
-            Timber.e("LOADING IMAGE URL ----> " + imageUrl);
             requestManager
                     .load(imageUrl)
                     .timeout(6000)
                     .listener(new RequestListener<Drawable>() {
                         @Override
                         public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                            Timber.e(e);
-                            Timber.e("BAD URL: " + finalImageUrl);
                             e.logRootCauses("bookviewholder");
                             return false;
                         }

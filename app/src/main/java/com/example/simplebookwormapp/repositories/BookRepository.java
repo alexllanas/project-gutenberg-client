@@ -53,10 +53,6 @@ public class BookRepository {
             @Override
             protected void saveCallResult(@NonNull ResponseBody item) {
                 try {
-                    Timber.d("BookID to save in DB: %d", bookId);
-                    Timber.d("in saveCallResult");
-                    Timber.d("item = %s", item);
-                    Timber.d("item.contentLength = %s", item.contentLength());
                     Reader r = item.charStream();
                     int intch;
                     StringBuilder sb = new StringBuilder();
@@ -64,7 +60,6 @@ public class BookRepository {
                         char ch = (char) intch;
                         sb.append(ch);
                     }
-//                    Timber.d("data = %s", sb.toString());
                     saveBookContentResponse(sb.toString(), bookId, context);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -73,13 +68,13 @@ public class BookRepository {
 
             @Override
             protected boolean shouldFetch(@Nullable ContentPath data) {
-                return true;
+                Timber.d(String.valueOf(data == null));
+                return data == null;
             }
 
             @NonNull
             @Override
             protected LiveData<ContentPath> loadFromDb() {
-                Timber.d("BookID to load from database: %d", bookId);
                 return contentPathDao.getPath(bookId);
             }
 
@@ -124,7 +119,6 @@ public class BookRepository {
             @NonNull
             @Override
             protected LiveData<List<Book>> loadFromDb() {
-                Timber.d("loadFromDb called");
                 return bookDao.searchBooks(query, pageNumber);
             }
 
@@ -132,10 +126,9 @@ public class BookRepository {
             @Override
             protected LiveData<ApiResponse<BookSearchResponse>> createCall() {
                 if (searchTopic) {
-                    Timber.d("query: " + query + " page number=" + pageNumber + " searchtopic=" + searchTopic);
+                    Timber.d("topic: %s\npage number: %s", query, pageNumber);
                     return RetrofitService.getBookApi().searchTopic(query, String.valueOf(pageNumber));
                 } else {
-                    Timber.d("query: " + query + " page number=" + pageNumber + " searchtopic=" + searchTopic);
                     return RetrofitService.getBookApi().searchBook(query, String.valueOf(pageNumber));
                 }
             }
@@ -148,8 +141,6 @@ public class BookRepository {
         int index = 0;
         for (long rowId : bookDao.insertBooks(item.getBooks().toArray(books))) {
             if (rowId == -1) {
-                Timber.d("saveCallResult: CONFLICT... This book is already in the cache");
-                Timber.d(books[index].getTitle());
                 // If book already exists do not insert because timestamp will be overwritten.
                 bookDao.updateBook(
                         books[index].getBook_id(),
@@ -164,17 +155,14 @@ public class BookRepository {
     }
 
     private void writeToFile(String data, long bookId, Context context) {
-        Timber.d("in writeToFile");
-        Timber.d(data);
-
         String fileName = bookId + ".txt";
         FileOutputStream fos = null;
 
         try {
             fos = context.openFileOutput(fileName, Context.MODE_PRIVATE);
             fos.write(data.getBytes());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            ContentPath contentPath = new ContentPath(bookId, fileName);
+            contentPathDao.insertContentPath(contentPath);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -186,21 +174,5 @@ public class BookRepository {
                 }
             }
         }
-
-
-//        try {
-//            String path = context.getFilesDir().getAbsolutePath() + bookId + ".txt";
-//            Timber.d(path);
-//            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(path, Context.MODE_PRIVATE));
-//            outputStreamWriter.write(data);
-//            outputStreamWriter.close();
-//
-//            ContentPath contentPath = new ContentPath(bookId, path);
-//            contentPathDao.insertContentPath(contentPath);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            Timber.e("An error occurred while writing data to file.");
-//        }
     }
-
 }

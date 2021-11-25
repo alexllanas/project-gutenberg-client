@@ -13,9 +13,6 @@ public class ApiResponse<T> {
     }
 
     public ApiResponse<T> create(Response<T> response) {
-        Timber.d("Response code: " + response.code());
-        Timber.d("Response successful: " + response.isSuccessful());
-        Timber.d(response.body().toString());
         if (response.isSuccessful()) {
             T body = response.body();
             if (body instanceof BookSearchResponse) {

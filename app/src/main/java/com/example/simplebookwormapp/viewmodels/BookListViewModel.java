@@ -38,7 +38,6 @@ public class BookListViewModel extends AndroidViewModel {
     public BookListViewModel(@NonNull Application application) {
         super(application);
         bookRepository = BookRepository.getInstance(application);
-        Timber.d(String.valueOf(isPerformingQuery));
         initViewState();
     }
 
@@ -93,8 +92,6 @@ public class BookListViewModel extends AndroidViewModel {
         books.addSource(repositorySource, new Observer<Resource<List<Book>>>() {
             @Override
             public void onChanged(@Nullable Resource<List<Book>> listResource) {
-                Timber.d("inside executeSearch");
-                Timber.d(listResource.message);
                 processResource(repositorySource, listResource);
             }
         });
@@ -115,12 +112,10 @@ public class BookListViewModel extends AndroidViewModel {
 
     private void processSuccessOrError(LiveData<Resource<List<Book>>> repositorySource, Resource<List<Book>> listResource) {
         if (listResource.status == Resource.Status.SUCCESS) {
-            Timber.d("Success");
             isPerformingQuery = false;
             checkIfResourceExhausted(listResource);
             books.removeSource(repositorySource);
         } else if (listResource.status == Resource.Status.ERROR) {
-            Timber.d("Error");
             isPerformingQuery = false;
             if (listResource.message.equals(Constants.QUERY_EXHAUSTED)) {
                 isQueryExhausted = true;
@@ -151,7 +146,4 @@ public class BookListViewModel extends AndroidViewModel {
             pageNumber = 1;
         }
     }
-
-
-
 }
