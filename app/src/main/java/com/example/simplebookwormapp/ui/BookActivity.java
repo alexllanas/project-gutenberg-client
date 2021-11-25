@@ -45,32 +45,36 @@ public class BookActivity extends BaseActivity {
             @Override
             public void onChanged(Resource<ContentPath> contentPathResource) {
                 if (contentPathResource != null) {
-                    if (contentPathResource.data != null) {
-                        processResourceByStatus(contentPathResource);
-                    }
+                    processResourceByStatus(contentPathResource);
                 }
             }
         });
     }
 
     private void processResourceByStatus(Resource<ContentPath> contentPathResource) {
+        Timber.d(contentPathResource.status.toString());
         switch (contentPathResource.status) {
             case LOADING: {
+                Timber.d("in loading");
                 showProgressBar(true);
                 break;
             }
             case ERROR: {
                 showProgressBar(false);
+                Timber.d("in error");
                 if (BuildConfig.DEBUG) {
-                    mBookContent.setText("No content.");
+                    mBookContent.setText(R.string.content_network_error);
                 }
                 break;
             }
             case SUCCESS: {
                 showProgressBar(false);
-                String content = readFromFile(contentPathResource.data.getPath_id());
-                mBookContent.setText(content);
-                break;
+                if (contentPathResource.data != null) {
+                    Timber.d("in success");
+                    String content = readFromFile(contentPathResource.data.getPath_id());
+                    mBookContent.setText(content);
+                    break;
+                }
             }
         }
     }
@@ -112,5 +116,11 @@ public class BookActivity extends BaseActivity {
             }
         }
         return "";
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        mBookViewModel.cancelSearchRequest();
     }
 }

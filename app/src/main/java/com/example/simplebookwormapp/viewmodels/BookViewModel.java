@@ -22,6 +22,8 @@ public class BookViewModel extends AndroidViewModel {
 
     private boolean cancelRequest;
     private boolean isPerformingQuery;
+    private String url;
+    private long bookId;
 
     public BookViewModel(@NonNull Application application) {
         super(application);
@@ -33,6 +35,13 @@ public class BookViewModel extends AndroidViewModel {
     }
 
     public void searchBookContent(String url, long bookId, Context context) {
+        this.url = url;
+        this.bookId = bookId;
+
+        executeSearch(context);
+    }
+
+    private void executeSearch(Context context) {
         cancelRequest = false;
         isPerformingQuery = true;
 
@@ -43,7 +52,6 @@ public class BookViewModel extends AndroidViewModel {
                 processResource(repositorySource, contentPathResource);
             }
         });
-
     }
 
     private void processResource(LiveData<Resource<ContentPath>> repositorySource, Resource<ContentPath> contentPathResource) {
@@ -66,6 +74,8 @@ public class BookViewModel extends AndroidViewModel {
         } else if (contentPathResource.status == Resource.Status.ERROR) {
             isPerformingQuery = false;
             bookContent.removeSource(repositorySource);
+        } else if(contentPathResource.status == Resource.Status.LOADING) {
+            isPerformingQuery = true;
         }
     }
 

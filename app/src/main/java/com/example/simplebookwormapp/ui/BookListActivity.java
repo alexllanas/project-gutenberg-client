@@ -48,6 +48,7 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_book_list);
         mRecyclerView = findViewById(R.id.book_list);
         mSearchView = findViewById(R.id.search_view);
@@ -195,7 +196,6 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
      */
     @Override
     public void onBookClick(int position) {
-
         Intent intent = new Intent(this, BookActivity.class);
         if (mAdapter.getSelectedBook(position) != null) {
             Book book = mAdapter.getSelectedBook(position);
@@ -209,6 +209,7 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
                         url = formats.getText_plain_ascii();
                     }
                     if (url != null) {
+                        Timber.d(url);
                         intent.putExtra("url", url);
                         intent.putExtra("id", book.getBook_id());
                         startActivity(intent);
