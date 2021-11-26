@@ -90,19 +90,19 @@ public class BookListViewModel extends AndroidViewModel {
         books.addSource(repositorySource, new Observer<Resource<List<Book>>>() {
             @Override
             public void onChanged(@Nullable Resource<List<Book>> listResource) {
-                processResource(repositorySource, listResource);
+                if (!cancelRequest) {
+                    processResource(repositorySource, listResource);
+                } else {
+                    books.removeSource(repositorySource);
+                }
             }
         });
     }
 
     private void processResource(LiveData<Resource<List<Book>>> repositorySource, Resource<List<Book>> listResource) {
-        if (!cancelRequest) {
-            if (listResource != null) {
-                processSuccessOrError(repositorySource, listResource);
-                books.setValue(listResource);
-            } else {
-                books.removeSource(repositorySource);
-            }
+        if (listResource != null) {
+            processSuccessOrError(repositorySource, listResource);
+            books.setValue(listResource);
         } else {
             books.removeSource(repositorySource);
         }

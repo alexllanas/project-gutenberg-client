@@ -47,19 +47,19 @@ public class BookViewModel extends AndroidViewModel {
         bookContent.addSource(repositorySource, new Observer<Resource<ContentPath>>() {
             @Override
             public void onChanged(Resource<ContentPath> contentPathResource) {
-                processResource(repositorySource, contentPathResource);
+                if (!cancelRequest) {
+                    processResource(repositorySource, contentPathResource);
+                } else {
+                    bookContent.removeSource(repositorySource);
+                }
             }
         });
     }
 
     private void processResource(LiveData<Resource<ContentPath>> repositorySource, Resource<ContentPath> contentPathResource) {
-        if (!cancelRequest) {
-            if (contentPathResource != null) {
-                processSuccessOrError(repositorySource, contentPathResource);
-                bookContent.setValue(contentPathResource);
-            } else {
-                bookContent.removeSource(repositorySource);
-            }
+        if (contentPathResource != null) {
+            processSuccessOrError(repositorySource, contentPathResource);
+            bookContent.setValue(contentPathResource);
         } else {
             bookContent.removeSource(repositorySource);
         }
@@ -72,7 +72,7 @@ public class BookViewModel extends AndroidViewModel {
         } else if (contentPathResource.status == Resource.Status.ERROR) {
             isPerformingQuery = false;
             bookContent.removeSource(repositorySource);
-        } else if(contentPathResource.status == Resource.Status.LOADING) {
+        } else if (contentPathResource.status == Resource.Status.LOADING) {
             isPerformingQuery = true;
         }
     }
