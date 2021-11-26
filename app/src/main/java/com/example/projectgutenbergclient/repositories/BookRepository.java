@@ -64,19 +64,20 @@ public class BookRepository {
 
             @Override
             protected boolean shouldFetch(@Nullable ContentPath data) {
-                Timber.d(String.valueOf(data == null));
                 return data == null;
             }
 
             @NonNull
             @Override
             protected LiveData<ContentPath> loadFromDb() {
+                Timber.d("loading book path from db");
                 return contentPathDao.getPath(bookId);
             }
 
             @NonNull
             @Override
             protected LiveData<ApiResponse<ResponseBody>> createCall() {
+                Timber.d("fetching book from network");
                 return RetrofitService.getBookApi().searchBookContent(url);
             }
         }.getAsLiveData();
@@ -121,8 +122,8 @@ public class BookRepository {
             @NonNull
             @Override
             protected LiveData<ApiResponse<BookSearchResponse>> createCall() {
+                Timber.d("fetching from network");
                 if (searchTopic) {
-                    Timber.d("topic: %s\npage number: %s", query, pageNumber);
                     return RetrofitService.getBookApi().searchTopic(query, String.valueOf(pageNumber));
                 } else {
                     return RetrofitService.getBookApi().searchBook(query, String.valueOf(pageNumber));

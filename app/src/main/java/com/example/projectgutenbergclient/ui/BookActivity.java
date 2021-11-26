@@ -32,6 +32,8 @@ public class BookActivity extends BaseActivity {
 
         mBookViewModel = new ViewModelProvider(this).get(BookViewModel.class);
 
+        showProgressBar(true);
+
         subscribeObservers();
         searchBookContent();
     }
@@ -48,11 +50,11 @@ public class BookActivity extends BaseActivity {
     }
 
     private void processResourceByStatus(Resource<ContentPath> contentPathResource) {
-        Timber.d(contentPathResource.status.toString());
+        Timber.d("status = " + contentPathResource.status.toString());
         switch (contentPathResource.status) {
             case LOADING: {
                 Timber.d("in loading");
-                showProgressBar(true);
+//                showProgressBar(true);
                 break;
             }
             case ERROR: {
@@ -67,7 +69,9 @@ public class BookActivity extends BaseActivity {
                 showProgressBar(false);
                 if (contentPathResource.data != null) {
                     Timber.d("in success");
+                    Timber.d("reading book content from file path");
                     String content = readFromFile(contentPathResource.data.getPath_id());
+                    Timber.d("done reading from file");
                     mBookContent.setText(content);
                     break;
                 }

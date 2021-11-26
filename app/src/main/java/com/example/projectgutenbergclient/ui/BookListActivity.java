@@ -2,6 +2,7 @@ package com.example.projectgutenbergclient.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -53,6 +54,54 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
         setSupportActionBar(findViewById(R.id.toolbar));
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        displayLoading(false);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mBookListViewModel.getViewState().getValue() == BookListViewModel.ViewState.CATEGORIES)
+            super.onBackPressed();
+        else {
+            mBookListViewModel.cancelSearchRequest();
+            mBookListViewModel.setViewCategories();
+        }
+    }
+
+    @Override
+    public void onBookClick(int position) {
+        displayLoading(true);
+
+        Intent intent = new Intent(this, BookActivity.class);
+        if (mAdapter.getSelectedBook(position) != null) {
+            Book book = mAdapter.getSelectedBook(position);
+            if (book != null) {
+                Formats formats = book.getFormats();
+                if (formats != null) {
+                    String url = null;
+                    if (formats.getText_plain_utf_8() != null) {
+                        url = formats.getText_plain_utf_8();
+                    } else if (formats.getText_plain_ascii() != null) {
+                        url = formats.getText_plain_ascii();
+                    }
+                    if (url != null) {
+                        Timber.d(url);
+                        intent.putExtra("url", url);
+                        intent.putExtra("id", book.getBook_id());
+                        startActivity(intent);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onCategoryClick(String category) {
+        searchBookApi(category, true);
+    }
+
     private void subscribeObservers() {
         mBookListViewModel.getBooks().observe(this, listResource -> {
             if (listResource != null) {
@@ -71,6 +120,59 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
                 }
             }
         });
+    }
+
+    private void initSearchView() {
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchBookApi(query, false);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+    }
+
+    private void initRecyclerView() {
+        ViewPreloadSizeProvider<String> viewPreloadSizeProvider = new ViewPreloadSizeProvider<>();
+
+        mAdapter = new BookRecyclerAdapter(this, initGlide(), viewPreloadSizeProvider);
+        VerticalSpacingItemDecoration itemDecoration = new VerticalSpacingItemDecoration(30);
+        mRecyclerView.addItemDecoration(itemDecoration);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        RecyclerViewPreloader<String> preloader = new RecyclerViewPreloader<String>(
+                Glide.with(this),
+                mAdapter,
+                viewPreloadSizeProvider,
+                32);
+        mRecyclerView.addOnScrollListener(preloader);
+
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+                if (!mRecyclerView.canScrollVertically(1) && mBookListViewModel.getViewState().getValue() == BookListViewModel.ViewState.BOOKS) {
+                    mBookListViewModel.searchNextPage();
+                }
+            }
+        });
+        mRecyclerView.setAdapter(mAdapter);
+    }
+
+    private RequestManager initGlide() {
+        RequestOptions options = new RequestOptions()
+                .placeholder(R.drawable.white_background)
+                .error(R.drawable.white_background);
+
+        return Glide
+                .with(this)
+                .setDefaultRequestOptions(options);
     }
 
     private void displayCategories() {
@@ -120,109 +222,20 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
     }
 
 
-    private void initSearchView() {
-        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                searchBookApi(query, false);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
-    }
-
-
-    private void initRecyclerView() {
-        ViewPreloadSizeProvider<String> viewPreloadSizeProvider = new ViewPreloadSizeProvider<>();
-
-        mAdapter = new BookRecyclerAdapter(this, initGlide(), viewPreloadSizeProvider);
-        VerticalSpacingItemDecoration itemDecoration = new VerticalSpacingItemDecoration(30);
-        mRecyclerView.addItemDecoration(itemDecoration);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        RecyclerViewPreloader<String> preloader = new RecyclerViewPreloader<String>(
-                Glide.with(this),
-                mAdapter,
-                viewPreloadSizeProvider,
-                32);
-        mRecyclerView.addOnScrollListener(preloader);
-
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-
-                if (!mRecyclerView.canScrollVertically(1) && mBookListViewModel.getViewState().getValue() == BookListViewModel.ViewState.BOOKS) {
-                    mBookListViewModel.searchNextPage();
-                }
-            }
-        });
-        mRecyclerView.setAdapter(mAdapter);
-    }
-
     private void searchBookApi(String query, boolean searchTopic) {
         mRecyclerView.scrollToPosition(0);
         mBookListViewModel.searchBooksApi(query, 1, searchTopic);
         mSearchView.clearFocus();
     }
 
-    private RequestManager initGlide() {
-        RequestOptions options = new RequestOptions()
-                .placeholder(R.drawable.white_background)
-                .error(R.drawable.white_background);
 
-        return Glide
-                .with(this)
-                .setDefaultRequestOptions(options);
-    }
-
-    /**
-     * Can't send whole Book object with intent:
-     * As a workaround -- send URL and book ID as extras.
-     *
-     * @param position
-     */
-    @Override
-    public void onBookClick(int position) {
-        Intent intent = new Intent(this, BookActivity.class);
-        if (mAdapter.getSelectedBook(position) != null) {
-            Book book = mAdapter.getSelectedBook(position);
-            if (book != null) {
-                Formats formats = book.getFormats();
-                if (formats != null) {
-                    String url = null;
-                    if (formats.getText_plain_utf_8() != null) {
-                        url = formats.getText_plain_utf_8();
-                    } else if (formats.getText_plain_ascii() != null) {
-                        url = formats.getText_plain_ascii();
-                    }
-                    if (url != null) {
-                        Timber.d(url);
-                        intent.putExtra("url", url);
-                        intent.putExtra("id", book.getBook_id());
-                        startActivity(intent);
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
-    public void onCategoryClick(String category) {
-        searchBookApi(category, true);
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (mBookListViewModel.getViewState().getValue() == BookListViewModel.ViewState.CATEGORIES)
-            super.onBackPressed();
-        else {
-            mBookListViewModel.cancelSearchRequest();
-            mBookListViewModel.setViewCategories();
+    private void displayLoading(boolean displayLoading) {
+        if (displayLoading) {
+            mRecyclerView.setVisibility(View.INVISIBLE);
+            showProgressBar(true);
+        } else {
+            showProgressBar(false);
+            mRecyclerView.setVisibility(View.VISIBLE);
         }
     }
 }
