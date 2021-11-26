@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SimpleBookWormApp</string>
+    <string name="app_name">ProjectGutenbergClient</string>
     <string name="dummy_string">category</string>
     <string name="exhausted_results">No more results...</string>
     <string name="content_network_error">Sorry, an error occurred while fetching your content.</string>
