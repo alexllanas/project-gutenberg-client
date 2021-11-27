@@ -16,6 +16,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Entity(tableName = "books")
 public class Book implements Parcelable {
@@ -160,12 +161,12 @@ public class Book implements Parcelable {
 
     public void setFormats(Formats format) {
         resizeImageUrl(format);
-        rectifyFilePrefixes(format);
+        changeFilePrefixes(format);
 
         this.formats = format;
     }
 
-    private void rectifyFilePrefixes(Formats format) {
+    private void changeFilePrefixes(Formats format) {
         String ascii = format.getText_plain_ascii();
         String utf8 = format.getText_plain_utf_8();
         if (ascii != null && ascii.endsWith("zip")) {
@@ -209,5 +210,17 @@ public class Book implements Parcelable {
         parcel.writeList(authors);
         parcel.writeParcelable(formats, i);
         parcel.writeLong(timestamp);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Book book = (Book) o;
+        return book_id == book.book_id && timestamp == book.timestamp && Objects.equals(title, book.title) && Objects.equals(authors, book.authors) && Objects.equals(subjects, book.subjects) && Objects.equals(formats, book.formats);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(book_id, title, authors, subjects, formats, timestamp);
     }
 }

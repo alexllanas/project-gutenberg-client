@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Objects;
+
 public class Formats implements Parcelable {
     @SerializedName("image/jpeg")
     private String image_jpeg;
@@ -147,5 +149,17 @@ public class Formats implements Parcelable {
         parcel.writeString(zip);
         parcel.writeString(text_plain_utf_8);
         parcel.writeString(text_plain_ascii);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Formats formats = (Formats) o;
+        return Objects.equals(image_jpeg, formats.image_jpeg) && Objects.equals(epub_zip, formats.epub_zip) && Objects.equals(rdf_xml, formats.rdf_xml) && Objects.equals(text_html_utf8, formats.text_html_utf8) && Objects.equals(x_mobipocket_ebook, formats.x_mobipocket_ebook) && Objects.equals(zip, formats.zip) && Objects.equals(text_plain_utf_8, formats.text_plain_utf_8) && Objects.equals(text_plain_ascii, formats.text_plain_ascii);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(image_jpeg, epub_zip, rdf_xml, text_html_utf8, x_mobipocket_ebook, zip, text_plain_utf_8, text_plain_ascii);
     }
 }

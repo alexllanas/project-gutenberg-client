@@ -2,6 +2,8 @@ plugins {
     id 'com.android.application'
 }
 
+apply plugin: "de.mannodermaus.android-junit5"
+
 android {
     compileSdk 31
 
@@ -28,6 +30,10 @@ android {
 }
 
 dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.testng:testng:6.9.6'
     def retrofitVersion = "2.9.0"
     def room_version = "2.3.0"
     def lifecycle_version = "2.4.0"
@@ -81,4 +87,13 @@ dependencies {
     implementation 'com.jakewharton.timber:timber:5.0.1'
 
     implementation 'de.hdodenhof:circleimageview:3.0.0'
+
+
+
+    // -------- LOCAL UNIT TESTS (use JUnit5)
+    // JUnit Jupiter
+    def junit_jupiter_version = "5.8.0"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junit_jupiter_version"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:$junit_jupiter_version"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit_jupiter_version"
 }
