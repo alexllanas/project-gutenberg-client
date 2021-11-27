@@ -22,12 +22,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import timber.log.Timber;
+
 public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ListPreloader.PreloadModelProvider<String> {
 
     private static final int LOADING_TYPE = 1;
     private static final int CATEGORY_TYPE = 2;
     private static final int BOOK_TYPE = 3;
     private static final int EXHAUSTED_TYPE = 4;
+
+    private int loadingIndex;
 
     private List<Book> mBooks;
     private OnBookListener mOnBookListener;
@@ -106,6 +110,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     public void displayBookCategories() {
+        clearBooksList();
         List<Book> categories = new ArrayList<>();
         for (int i = 0; i < Constants.DEFAULT_BOOK_CATEGORIES.length; i++) {
             Book book = new Book();
@@ -135,6 +140,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             Book book = new Book();
             book.setTitle("LOADING");
             mBooks.add(book);
+            loadingIndex = mBooks.size() - 1;
             notifyDataSetChanged();
         }
     }
@@ -143,7 +149,8 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         if (isLoading()) {
             if (mBooks.get(0).getTitle().equals("LOADING")) {
                 mBooks.remove(0);
-            } else if (mBooks.get(mBooks.size() - 1).equals("LOADING")) {
+
+            } else if (mBooks.get(mBooks.size() - 1).getTitle().equals("LOADING")) {
                 mBooks.remove(mBooks.size() - 1);
             }
             notifyDataSetChanged();
@@ -172,9 +179,18 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
 
     public void setBooks(List<Book> books) {
-        mBooks = books;
+//        if (books.isEmpty()) {
+//            mBooks = books;
+//        } else {
+        mBooks.addAll(books.subList(mBooks.size(), books.size()));
+//        }
         notifyDataSetChanged();
     }
+
+    public void appendBooks(List<Book> books) {
+        notifyDataSetChanged();
+    }
+
 
     public void setQueryExhausted() {
         hideLoading();
@@ -202,4 +218,6 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public RequestBuilder<?> getPreloadRequestBuilder(@NonNull String item) {
         return requestManager.load(item);
     }
+
+
 }

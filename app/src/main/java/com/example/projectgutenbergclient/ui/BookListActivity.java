@@ -191,7 +191,6 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
             }
             case SUCCESS: {
                 mAdapter.hideLoading();
-                assert listResource.data != null;
                 mAdapter.setBooks(listResource.data);
                 break;
             }
