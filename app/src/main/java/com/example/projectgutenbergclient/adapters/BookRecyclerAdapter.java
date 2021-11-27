@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import timber.log.Timber;
-
 public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ListPreloader.PreloadModelProvider<String> {
 
     private static final int LOADING_TYPE = 1;
@@ -31,10 +29,8 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private static final int BOOK_TYPE = 3;
     private static final int EXHAUSTED_TYPE = 4;
 
-    private int loadingIndex;
-
     private List<Book> mBooks;
-    private OnBookListener mOnBookListener;
+    private final OnBookListener mOnBookListener;
     private final RequestManager requestManager;
     private final ViewPreloadSizeProvider<String> viewPreloadSizeProvider;
 
@@ -127,9 +123,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     public void displayOnlyLoading() {
         clearBooksList();
-        Book book = new Book();
-        book.setTitle("LOADING");
-        mBooks.add(book);
+        appendItemTypeBook("LOADING");
         notifyDataSetChanged();
     }
 
@@ -137,10 +131,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         if (mBooks == null)
             mBooks = new ArrayList<>();
         if (!isLoading()) {
-            Book book = new Book();
-            book.setTitle("LOADING");
-            mBooks.add(book);
-            loadingIndex = mBooks.size() - 1;
+            appendItemTypeBook("LOADING");
             notifyDataSetChanged();
         }
     }
@@ -179,25 +170,25 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
 
     public void setBooks(List<Book> books) {
-//        if (books.isEmpty()) {
-//            mBooks = books;
-//        } else {
-        mBooks.addAll(books.subList(mBooks.size(), books.size()));
-//        }
+        if (books.isEmpty()) {
+            mBooks = books;
+        } else {
+            mBooks.addAll(books.subList(mBooks.size(), books.size()));
+        }
         notifyDataSetChanged();
-    }
 
-    public void appendBooks(List<Book> books) {
-        notifyDataSetChanged();
     }
-
 
     public void setQueryExhausted() {
         hideLoading();
-        Book exhaustedBook = new Book();
-        exhaustedBook.setTitle("EXHAUSTED");
-        mBooks.add(exhaustedBook);
+        appendItemTypeBook("EXHAUSTED");
         notifyDataSetChanged();
+    }
+
+    private void appendItemTypeBook(String type) {
+        Book typeBook = new Book();
+        typeBook.setTitle(type);
+        mBooks.add(typeBook);
     }
 
     @NonNull

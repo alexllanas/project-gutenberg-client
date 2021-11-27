@@ -27,8 +27,13 @@ import com.example.projectgutenbergclient.util.Resource;
 import com.example.projectgutenbergclient.util.VerticalSpacingItemDecoration;
 import com.example.projectgutenbergclient.viewmodels.BookListViewModel;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
+import kotlin.collections.EmptyList;
 import timber.log.Timber;
 
 public class BookListActivity extends BaseActivity implements OnBookListener {
