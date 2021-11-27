@@ -12,7 +12,7 @@ import java.util.List;
 public class BookTest {
 
     /*
-       Compare two equal Notes
+       Compare two equal Books
     */
     @Test
     void areBooksEqual_identicalProperties_returnTrue() {
