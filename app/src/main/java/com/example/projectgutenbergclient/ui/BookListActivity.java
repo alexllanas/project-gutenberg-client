@@ -16,7 +16,6 @@ import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.util.ViewPreloadSizeProvider;
-import com.example.projectgutenbergclient.BuildConfig;
 import com.example.projectgutenbergclient.R;
 import com.example.projectgutenbergclient.adapters.BookRecyclerAdapter;
 import com.example.projectgutenbergclient.adapters.OnBookListener;
@@ -26,14 +25,13 @@ import com.example.projectgutenbergclient.util.Constants;
 import com.example.projectgutenbergclient.util.Resource;
 import com.example.projectgutenbergclient.util.VerticalSpacingItemDecoration;
 import com.example.projectgutenbergclient.viewmodels.BookListViewModel;
+import com.example.projectgutenbergclient.viewmodels.ViewModelProviderFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
-import kotlin.collections.EmptyList;
+import javax.inject.Inject;
+
+import de.hdodenhof.circleimageview.BuildConfig;
 import timber.log.Timber;
 
 public class BookListActivity extends BaseActivity implements OnBookListener {
@@ -43,6 +41,9 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
     private SearchView mSearchView;
     private BookRecyclerAdapter mAdapter;
 
+//    @Inject
+//    ViewModelProviderFactory viewModelProviderFactory;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +52,8 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
         mRecyclerView = findViewById(R.id.book_list);
         mSearchView = findViewById(R.id.search_view);
 
+        // Don't really need ViewModelProviderFactory because BookListViewModel is not parameterized.
+//        mBookListViewModel = new ViewModelProvider(this, viewModelProviderFactory).get(BookListViewModel.class);
         mBookListViewModel = new ViewModelProvider(this).get(BookListViewModel.class);
 
         initRecyclerView();

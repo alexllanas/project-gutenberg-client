@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
@@ -52,6 +53,7 @@ public class Book implements Parcelable {
     public Book() {
     }
 
+    @Ignore
     public Book(Parcel in) {
         book_id = in.readLong();
         title = in.readString();
@@ -74,6 +76,7 @@ public class Book implements Parcelable {
      * @param timestamp
      */
     @RequiresApi(api = Build.VERSION_CODES.N)
+    @Ignore
     public Book(long book_id, String title, List<Author> authors, ArrayList<String> subjects, Formats formats) {
         this.book_id = book_id;
         this.title = title;
@@ -151,7 +154,7 @@ public class Book implements Parcelable {
         return timestamp;
     }
 
-    public void setTimestamp(int timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 

@@ -1,0 +1,90 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "279032174ec9528b5a42be20188ff8d4",
+    "entities": [
+      {
+        "tableName": "books",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`book_id` INTEGER NOT NULL, `title` TEXT, `authors` TEXT, `subjects` TEXT, `formats` TEXT, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`book_id`))",
+        "fields": [
+          {
+            "fieldPath": "book_id",
+            "columnName": "book_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "authors",
+            "columnName": "authors",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "subjects",
+            "columnName": "subjects",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "formats",
+            "columnName": "formats",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "book_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "paths",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`path_id` INTEGER NOT NULL, `path` TEXT, PRIMARY KEY(`path_id`))",
+        "fields": [
+          {
+            "fieldPath": "path_id",
+            "columnName": "path_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "path",
+            "columnName": "path",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "path_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '279032174ec9528b5a42be20188ff8d4')"
+    ]
+  }
+}

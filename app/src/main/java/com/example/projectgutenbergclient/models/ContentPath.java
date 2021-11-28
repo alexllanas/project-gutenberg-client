@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 //        foreignKeys = {
@@ -33,11 +34,13 @@ public class ContentPath implements Parcelable {
     public ContentPath() {
     }
 
+    @Ignore
     public ContentPath(long path_id, String path) {
         this.path_id = path_id;
         this.path = path;
     }
 
+    @Ignore
     protected ContentPath(Parcel in) {
         path_id = in.readLong();
         path = in.readString();

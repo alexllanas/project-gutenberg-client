@@ -11,9 +11,10 @@ import android.widget.ProgressBar;
 
 import com.example.projectgutenbergclient.R;
 
+import dagger.android.support.DaggerAppCompatActivity;
 import timber.log.Timber;
 
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends DaggerAppCompatActivity {
 
     public ProgressBar mProgressBar;
 
