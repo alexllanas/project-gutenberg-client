@@ -17,6 +17,8 @@ import com.example.projectgutenbergclient.util.Resource;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class BookListViewModel extends AndroidViewModel {
 
     public enum ViewState {CATEGORIES, BOOKS}
@@ -33,6 +35,7 @@ public class BookListViewModel extends AndroidViewModel {
     private String query;
     private int pageNumber;
 
+    @Inject
     public BookListViewModel(@NonNull Application application) {
         super(application);
         bookRepository = BookRepository.getInstance(application);

@@ -41,8 +41,8 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
     private SearchView mSearchView;
     private BookRecyclerAdapter mAdapter;
 
-//    @Inject
-//    ViewModelProviderFactory viewModelProviderFactory;
+    @Inject
+    ViewModelProviderFactory viewModelProviderFactory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +53,8 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
         mSearchView = findViewById(R.id.search_view);
 
         // Don't really need ViewModelProviderFactory because BookListViewModel is not parameterized.
-//        mBookListViewModel = new ViewModelProvider(this, viewModelProviderFactory).get(BookListViewModel.class);
-        mBookListViewModel = new ViewModelProvider(this).get(BookListViewModel.class);
+        mBookListViewModel = new ViewModelProvider(this, viewModelProviderFactory).get(BookListViewModel.class);
+//        mBookListViewModel = new ViewModelProvider(this).get(BookListViewModel.class);
 
         initRecyclerView();
         initSearchView();

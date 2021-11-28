@@ -13,6 +13,8 @@ import com.example.projectgutenbergclient.models.ContentPath;
 import com.example.projectgutenbergclient.repositories.BookRepository;
 import com.example.projectgutenbergclient.util.Resource;
 
+import javax.inject.Inject;
+
 public class BookViewModel extends AndroidViewModel {
 
     private final BookRepository bookRepository;
@@ -23,6 +25,7 @@ public class BookViewModel extends AndroidViewModel {
     private String url;
     private long bookId;
 
+    @Inject
     public BookViewModel(@NonNull Application application) {
         super(application);
         this.bookRepository = BookRepository.getInstance(application);

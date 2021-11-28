@@ -1,5 +1,7 @@
 package com.example.projectgutenbergclient.di;
 
+import com.example.projectgutenbergclient.di.BookList.BookListScope;
+import com.example.projectgutenbergclient.requests.BookApi;
 import com.example.projectgutenbergclient.util.Constants;
 import com.example.projectgutenbergclient.util.LiveDataCallAdapterFactory;
 
@@ -21,5 +23,11 @@ public class AppModule {
                 .addCallAdapterFactory(new LiveDataCallAdapterFactory())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+    }
+
+    @Singleton
+    @Provides
+    static BookApi provideAuthApi(Retrofit retrofit) {
+        return retrofit.create(BookApi.class);
     }
 }

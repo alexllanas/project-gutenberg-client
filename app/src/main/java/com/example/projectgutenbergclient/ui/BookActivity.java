@@ -12,11 +12,14 @@ import com.example.projectgutenbergclient.R;
 import com.example.projectgutenbergclient.models.ContentPath;
 import com.example.projectgutenbergclient.util.Resource;
 import com.example.projectgutenbergclient.viewmodels.BookViewModel;
+import com.example.projectgutenbergclient.viewmodels.ViewModelProviderFactory;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
+import javax.inject.Inject;
 
 import timber.log.Timber;
 
@@ -24,13 +27,16 @@ public class BookActivity extends BaseActivity {
     private TextView mBookContent;
     private BookViewModel mBookViewModel;
 
+    @Inject
+    ViewModelProviderFactory viewModelProviderFactory;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book);
         mBookContent = findViewById(R.id.book_content);
 
-        mBookViewModel = new ViewModelProvider(this).get(BookViewModel.class);
+        mBookViewModel = new ViewModelProvider(this, viewModelProviderFactory).get(BookViewModel.class);
 
         showProgressBar(true);
 
