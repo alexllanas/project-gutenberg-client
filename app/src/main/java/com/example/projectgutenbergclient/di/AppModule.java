@@ -1,6 +1,15 @@
 package com.example.projectgutenbergclient.di;
 
+import static com.example.projectgutenbergclient.persistence.BookDatabase.DATABASE_NAME;
+
+import android.app.Application;
+
+import androidx.room.Room;
+
 import com.example.projectgutenbergclient.di.BookList.BookListScope;
+import com.example.projectgutenbergclient.persistence.BookDao;
+import com.example.projectgutenbergclient.persistence.BookDatabase;
+import com.example.projectgutenbergclient.persistence.ContentPathDao;
 import com.example.projectgutenbergclient.requests.BookApi;
 import com.example.projectgutenbergclient.util.Constants;
 import com.example.projectgutenbergclient.util.LiveDataCallAdapterFactory;
@@ -29,5 +38,27 @@ public class AppModule {
     @Provides
     static BookApi provideAuthApi(Retrofit retrofit) {
         return retrofit.create(BookApi.class);
+    }
+
+    @Singleton
+    @Provides
+    static BookDatabase provideBookDatabase(Application application) {
+        return Room.databaseBuilder(
+                application,
+                BookDatabase.class,
+                DATABASE_NAME
+        ).build();
+    }
+
+    @Singleton
+    @Provides
+    static BookDao provideBookDao(BookDatabase bookDatabase) {
+        return bookDatabase.getBookDao();
+    }
+
+    @Singleton
+    @Provides
+    static ContentPathDao provideContentPathDao(BookDatabase bookDatabase) {
+        return bookDatabase.getContentPathDao();
     }
 }
