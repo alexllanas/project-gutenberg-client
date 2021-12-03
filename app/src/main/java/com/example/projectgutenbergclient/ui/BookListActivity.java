@@ -97,7 +97,7 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
                     if (url != null) {
                         Timber.d(url);
                         intent.putExtra("url", url);
-                        intent.putExtra("id", book.getBook_id());
+                        intent.putExtra("id", book.getId());
                         startActivity(intent);
                     }
                 }

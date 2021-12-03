@@ -22,6 +22,8 @@ public class Formats implements Parcelable {
     private String zip;
     @SerializedName("text/plain; charset=utf-8")
     private String text_plain_utf_8;
+    @SerializedName("text/plain; charset=us-ascii")
+    private String text_plain_ascii;
 
     public String getText_plain_ascii() {
         return text_plain_ascii;
@@ -31,8 +33,6 @@ public class Formats implements Parcelable {
         this.text_plain_ascii = text_plain_ascii;
     }
 
-    @SerializedName("text/plain; charset=us-ascii")
-    private String text_plain_ascii;
 
 
 

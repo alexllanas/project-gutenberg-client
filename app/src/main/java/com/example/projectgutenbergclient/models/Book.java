@@ -28,9 +28,10 @@ public class Book implements Parcelable {
     @SerializedName("id")
     @PrimaryKey
     @NonNull
-    private long book_id;
+    private long id;
 
     @ColumnInfo(name = "title")
+    @NonNull
     private String title;
 
     @SerializedName("authors")
@@ -53,9 +54,18 @@ public class Book implements Parcelable {
     public Book() {
     }
 
+    public Book(Book book) {
+        this.id = book.getId();
+        this.title = book.getTitle();
+        this.authors = book.getAuthors();
+        this.subjects = book.getSubjects();
+        this.formats = book.getFormats();
+        this.timestamp = book.getTimestamp();
+    }
+
     @Ignore
     public Book(Parcel in) {
-        book_id = in.readLong();
+        id = in.readLong();
         title = in.readString();
         authors = new ArrayList<>();
         in.readList(authors, Book.class.getClassLoader());
@@ -68,7 +78,7 @@ public class Book implements Parcelable {
     /**
      * The list of authors is constructed from an array of Author objects from the api response.
      *
-     * @param book_id
+     * @param id
      * @param title
      * @param authors
      * @param subjects
@@ -77,13 +87,22 @@ public class Book implements Parcelable {
      */
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Ignore
-    public Book(long book_id, String title, List<Author> authors, ArrayList<String> subjects, Formats formats) {
-        this.book_id = book_id;
+    public Book(long id, String title, List<Author> authors, ArrayList<String> subjects, Formats formats) {
+        this.id = id;
         this.title = title;
         this.authors = authors;
         this.subjects = subjects;
         this.formats = formats;
         this.timestamp = new Date().getTime();
+    }
+
+    public Book(long id, String title, List<Author> authors, ArrayList<String> subjects, Formats formats, long timestamp) {
+        this.id = id;
+        this.title = title;
+        this.authors = authors;
+        this.subjects = subjects;
+        this.formats = formats;
+        this.timestamp = timestamp;
     }
 
     private void resizeImageUrl(Formats format) {
@@ -117,12 +136,12 @@ public class Book implements Parcelable {
      * Getters and setters
      */
 
-    public long getBook_id() {
-        return book_id;
+    public long getId() {
+        return id;
     }
 
-    public void setBook_id(long book_id) {
-        this.book_id = book_id;
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -208,7 +227,7 @@ public class Book implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeLong(book_id);
+        parcel.writeLong(id);
         parcel.writeString(title);
         parcel.writeList(authors);
         parcel.writeParcelable(formats, i);
@@ -219,11 +238,11 @@ public class Book implements Parcelable {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Book book = (Book) o;
-        return book_id == book.book_id && timestamp == book.timestamp && Objects.equals(title, book.title) && Objects.equals(authors, book.authors) && Objects.equals(subjects, book.subjects) && Objects.equals(formats, book.formats);
+        return id == book.id && timestamp == book.timestamp && Objects.equals(title, book.title) && Objects.equals(authors, book.authors) && Objects.equals(subjects, book.subjects) && Objects.equals(formats, book.formats);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(book_id, title, authors, subjects, formats, timestamp);
+        return Objects.hash(id, title, authors, subjects, formats, timestamp);
     }
 }

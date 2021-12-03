@@ -85,7 +85,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public int getItemViewType(int position) {
-        if (mBooks.get(position).getBook_id() == -1) {
+        if (mBooks.get(position).getId() == -1) {
             return CATEGORY_TYPE;
         } else if (mBooks.get(position).getTitle().equals("LOADING")) {
             return LOADING_TYPE;
@@ -114,7 +114,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             Formats formats = new Formats();
             formats.setImage_jpeg(Constants.DEFAULT_BOOK_CATEGORIES_IMAGES[i]);
             book.setFormats(formats);
-            book.setBook_id(-1);
+            book.setId(-1);
             categories.add(book);
         }
         mBooks = categories;

@@ -140,7 +140,7 @@ public class BookRepository {
             if (rowId == -1) {
                 // If book already exists do not insert because timestamp will be overwritten.
                 bookDao.updateBook(
-                        books[index].getBook_id(),
+                        books[index].getId(),
                         books[index].getTitle(),
                         books[index].getAuthors(),
                         books[index].getFormats(),
