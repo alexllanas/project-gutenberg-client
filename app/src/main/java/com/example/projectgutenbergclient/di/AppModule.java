@@ -10,6 +10,7 @@ import com.example.projectgutenbergclient.di.BookList.BookListScope;
 import com.example.projectgutenbergclient.persistence.BookDao;
 import com.example.projectgutenbergclient.persistence.BookDatabase;
 import com.example.projectgutenbergclient.persistence.ContentPathDao;
+import com.example.projectgutenbergclient.repositories.BookRepository;
 import com.example.projectgutenbergclient.requests.BookApi;
 import com.example.projectgutenbergclient.util.Constants;
 import com.example.projectgutenbergclient.util.LiveDataCallAdapterFactory;
@@ -60,5 +61,11 @@ public class AppModule {
     @Provides
     static ContentPathDao provideContentPathDao(BookDatabase bookDatabase) {
         return bookDatabase.getContentPathDao();
+    }
+
+    @Singleton
+    @Provides
+    static BookRepository provideBookRepository(BookDao bookDao, ContentPathDao contentPathDao) {
+        return new BookRepository(bookDao, contentPathDao);
     }
 }

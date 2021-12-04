@@ -23,25 +23,21 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import okhttp3.ResponseBody;
 import timber.log.Timber;
 
 public class BookRepository {
 
-    private static BookRepository INSTANCE;
-    private BookDao bookDao;
-    private ContentPathDao contentPathDao;
+    private final BookDao bookDao;
+    private final ContentPathDao contentPathDao;
 
-    public static BookRepository getInstance(Context context) {
-        if (INSTANCE == null) {
-            INSTANCE = new BookRepository(context);
-        }
-        return INSTANCE;
-    }
 
-    private BookRepository(Context context) {
-        bookDao = BookDatabase.getInstance(context).getBookDao();
-        contentPathDao = BookDatabase.getInstance(context).getContentPathDao();
+    @Inject
+    public BookRepository(BookDao bookDao, ContentPathDao contentPathDao) {
+        this.bookDao = bookDao;
+        this.contentPathDao = contentPathDao;
     }
 
     public LiveData<Resource<ContentPath>> searchBookContent(final String url, long bookId, Context context) {

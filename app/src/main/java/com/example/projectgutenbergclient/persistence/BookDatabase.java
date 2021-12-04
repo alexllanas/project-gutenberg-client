@@ -16,21 +16,8 @@ public abstract class BookDatabase extends RoomDatabase {
 
     public static final String DATABASE_NAME = "book_db";
 
-    private static BookDatabase INSTANCE;
-
-    public static BookDatabase getInstance(final Context context) {
-        if (INSTANCE == null) {
-            INSTANCE = Room.databaseBuilder(
-                    context.getApplicationContext(),
-                    BookDatabase.class,
-                    DATABASE_NAME
-            ).build();
-        }
-        return INSTANCE;
-    }
-
     public abstract BookDao getBookDao();
 
-    public abstract  ContentPathDao getContentPathDao();
+    public abstract ContentPathDao getContentPathDao();
 
 }

@@ -2,6 +2,7 @@ package com.example.projectgutenbergclient.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -21,6 +22,7 @@ import com.example.projectgutenbergclient.adapters.BookRecyclerAdapter;
 import com.example.projectgutenbergclient.adapters.OnBookListener;
 import com.example.projectgutenbergclient.models.Book;
 import com.example.projectgutenbergclient.models.Formats;
+import com.example.projectgutenbergclient.repositories.BookRepository;
 import com.example.projectgutenbergclient.util.Constants;
 import com.example.projectgutenbergclient.util.Resource;
 import com.example.projectgutenbergclient.util.VerticalSpacingItemDecoration;
@@ -44,6 +46,9 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
     @Inject
     ViewModelProviderFactory viewModelProviderFactory;
 
+    @Inject
+    RequestManager requestManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,9 +57,7 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
         mRecyclerView = findViewById(R.id.book_list);
         mSearchView = findViewById(R.id.search_view);
 
-        // Don't really need ViewModelProviderFactory because BookListViewModel is not parameterized.
         mBookListViewModel = new ViewModelProvider(this, viewModelProviderFactory).get(BookListViewModel.class);
-//        mBookListViewModel = new ViewModelProvider(this).get(BookListViewModel.class);
 
         initRecyclerView();
         initSearchView();
@@ -148,12 +151,12 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
     private void initRecyclerView() {
         ViewPreloadSizeProvider<String> viewPreloadSizeProvider = new ViewPreloadSizeProvider<>();
 
-        mAdapter = new BookRecyclerAdapter(this, initGlide(), viewPreloadSizeProvider);
+        mAdapter = new BookRecyclerAdapter(this, requestManager, viewPreloadSizeProvider);
         VerticalSpacingItemDecoration itemDecoration = new VerticalSpacingItemDecoration(30);
         mRecyclerView.addItemDecoration(itemDecoration);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        RecyclerViewPreloader<String> preloader = new RecyclerViewPreloader<String>(
+        RecyclerViewPreloader<String> preloader = new RecyclerViewPreloader<>(
                 Glide.with(this),
                 mAdapter,
                 viewPreloadSizeProvider,
@@ -171,16 +174,6 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
             }
         });
         mRecyclerView.setAdapter(mAdapter);
-    }
-
-    private RequestManager initGlide() {
-        RequestOptions options = new RequestOptions()
-                .placeholder(R.drawable.white_background)
-                .error(R.drawable.white_background);
-
-        return Glide
-                .with(this)
-                .setDefaultRequestOptions(options);
     }
 
     private void displayCategories() {

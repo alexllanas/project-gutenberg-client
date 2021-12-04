@@ -26,9 +26,9 @@ public class BookViewModel extends AndroidViewModel {
     private long bookId;
 
     @Inject
-    public BookViewModel(@NonNull Application application) {
+    public BookViewModel(@NonNull Application application, BookRepository bookRepository) {
         super(application);
-        this.bookRepository = BookRepository.getInstance(application);
+        this.bookRepository = bookRepository;
     }
 
     public LiveData<Resource<ContentPath>> getBookContent() {

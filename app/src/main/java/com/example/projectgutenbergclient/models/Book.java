@@ -54,6 +54,7 @@ public class Book implements Parcelable {
     public Book() {
     }
 
+    @Ignore
     public Book(Book book) {
         this.id = book.getId();
         this.title = book.getTitle();

@@ -8,9 +8,4 @@ import dagger.Module;
 @Module
 public class BookModule {
 
-//    @BookScope
-//    @Provides
-//    static BookApi provideAuthApi(Retrofit retrofit) {
-//        return retrofit.create(BookApi.class);
-//    }
 }

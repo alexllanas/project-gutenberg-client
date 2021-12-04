@@ -5,7 +5,6 @@ import com.example.projectgutenbergclient.util.MyDebugTree;
 
 import dagger.android.AndroidInjector;
 import dagger.android.support.DaggerApplication;
-import de.hdodenhof.circleimageview.BuildConfig;
 import timber.log.Timber;
 
 public class BaseApplication extends DaggerApplication {

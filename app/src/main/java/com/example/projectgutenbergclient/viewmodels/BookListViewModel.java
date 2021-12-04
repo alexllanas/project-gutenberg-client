@@ -25,6 +25,7 @@ public class BookListViewModel extends AndroidViewModel {
 
     private MutableLiveData<ViewState> viewState;
     private final MediatorLiveData<Resource<List<Book>>> books = new MediatorLiveData<>();
+
     private final BookRepository bookRepository;
 
     // extra query info
@@ -36,9 +37,9 @@ public class BookListViewModel extends AndroidViewModel {
     private int pageNumber;
 
     @Inject
-    public BookListViewModel(@NonNull Application application) {
+    public BookListViewModel(@NonNull Application application, BookRepository bookRepository) {
         super(application);
-        bookRepository = BookRepository.getInstance(application);
+        this.bookRepository = bookRepository;
         initViewState();
     }
 
