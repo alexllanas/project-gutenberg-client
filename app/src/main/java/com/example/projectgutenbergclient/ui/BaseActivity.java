@@ -19,18 +19,6 @@ public abstract class BaseActivity extends DaggerAppCompatActivity {
     public ProgressBar mProgressBar;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        ConstraintLayout constraintLayout = (ConstraintLayout) getLayoutInflater().inflate(R.layout.activity_base, null);
-        FrameLayout frameLayout = constraintLayout.findViewById(R.id.activity_content);
-        mProgressBar = constraintLayout.findViewById(R.id.progress_bar);
-        Timber.d(String.valueOf(mProgressBar == null));
-
-//        getLayoutInflater().inflate(layoutResID, frameLayout, true);
-        super.setContentView(constraintLayout);
-    }
-
-    @Override
     public void setContentView(int layoutResID) {
         ConstraintLayout constraintLayout = (ConstraintLayout) getLayoutInflater().inflate(R.layout.activity_base, null);
         FrameLayout frameLayout = constraintLayout.findViewById(R.id.activity_content);
