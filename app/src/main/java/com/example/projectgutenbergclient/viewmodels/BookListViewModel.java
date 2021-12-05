@@ -105,14 +105,14 @@ public class BookListViewModel extends AndroidViewModel {
 
     private void processResource(LiveData<Resource<List<Book>>> repositorySource, Resource<List<Book>> listResource) {
         if (listResource != null) {
-            processSuccessOrError(repositorySource, listResource);
+            processResourceStatus(repositorySource, listResource);
             books.setValue(listResource);
         } else {
             books.removeSource(repositorySource);
         }
     }
 
-    private void processSuccessOrError(LiveData<Resource<List<Book>>> repositorySource, Resource<List<Book>> listResource) {
+    private void processResourceStatus(LiveData<Resource<List<Book>>> repositorySource, Resource<List<Book>> listResource) {
         if (listResource.status == Resource.Status.SUCCESS) {
             isPerformingQuery = false;
             checkIfResourceExhausted(listResource);
