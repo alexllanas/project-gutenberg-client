@@ -41,7 +41,10 @@ public class BookActivity extends BaseActivity {
         showProgressBar(true);
 
         subscribeObservers();
-        searchBookContent();
+
+        if (savedInstanceState == null) {
+            searchBookContent();
+        }
     }
 
     private void subscribeObservers() {
