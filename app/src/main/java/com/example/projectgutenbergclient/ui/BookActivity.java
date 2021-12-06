@@ -1,14 +1,17 @@
 package com.example.projectgutenbergclient.ui;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.viewbinding.ViewBinding;
 
 import com.example.projectgutenbergclient.BuildConfig;
 import com.example.projectgutenbergclient.R;
+import com.example.projectgutenbergclient.databinding.ActivityBookBinding;
 import com.example.projectgutenbergclient.models.ContentPath;
 import com.example.projectgutenbergclient.util.Resource;
 import com.example.projectgutenbergclient.viewmodels.BookViewModel;
@@ -21,10 +24,13 @@ import java.io.InputStreamReader;
 
 import javax.inject.Inject;
 
+import dagger.android.support.DaggerAppCompatActivity;
 import timber.log.Timber;
 
-public class BookActivity extends BaseActivity {
-    private TextView mBookContent;
+//public class BookActivity extends BaseActivity {
+public class BookActivity extends DaggerAppCompatActivity {
+
+    private ActivityBookBinding binding;
     private BookViewModel mBookViewModel;
 
     @Inject
@@ -33,12 +39,13 @@ public class BookActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_book);
-        mBookContent = findViewById(R.id.book_content);
+        binding = ActivityBookBinding.inflate(getLayoutInflater());
 
+        setContentView(binding.getRoot());
         mBookViewModel = new ViewModelProvider(this, viewModelProviderFactory).get(BookViewModel.class);
 
-        showProgressBar(true);
+//        showProgressBar(true);
+        binding.progressBar.setVisibility(View.VISIBLE);
 
         subscribeObservers();
 
@@ -63,14 +70,14 @@ public class BookActivity extends BaseActivity {
         switch (contentPathResource.status) {
             case LOADING: {
                 Timber.d("in loading");
-//                showProgressBar(true);
+                showProgressBar(true);
                 break;
             }
             case ERROR: {
                 showProgressBar(false);
                 Timber.d("in error");
                 if (BuildConfig.DEBUG) {
-                    mBookContent.setText(R.string.content_network_error);
+                    binding.bookContent.setText(R.string.content_network_error);
                 }
                 break;
             }
@@ -81,7 +88,7 @@ public class BookActivity extends BaseActivity {
                     Timber.d("reading book content from file path");
                     String content = readFromFile(contentPathResource.data.getPath_id());
                     Timber.d("done reading from file");
-                    mBookContent.setText(content);
+                    binding.bookContent.setText(content);
                     break;
                 }
             }
@@ -136,5 +143,9 @@ public class BookActivity extends BaseActivity {
     public void onBackPressed() {
         super.onBackPressed();
         mBookViewModel.cancelSearchRequest();
+    }
+
+    public void showProgressBar( boolean visibility) {
+        binding.progressBar.setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
     }
 }

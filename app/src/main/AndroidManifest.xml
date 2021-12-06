@@ -14,9 +14,6 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity
-            android:name="com.example.projectgutenbergclient.ui.BaseActivity"
-            android:exported="false" />
-        <activity
             android:name="com.example.projectgutenbergclient.ui.BookListActivity"
             android:exported="true">
             <intent-filter>

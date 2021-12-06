@@ -20,6 +20,7 @@ import com.bumptech.glide.util.ViewPreloadSizeProvider;
 import com.example.projectgutenbergclient.R;
 import com.example.projectgutenbergclient.adapters.BookRecyclerAdapter;
 import com.example.projectgutenbergclient.adapters.OnBookListener;
+import com.example.projectgutenbergclient.databinding.ActivityBookListBinding;
 import com.example.projectgutenbergclient.models.Book;
 import com.example.projectgutenbergclient.models.Formats;
 import com.example.projectgutenbergclient.repositories.BookRepository;
@@ -33,16 +34,17 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import dagger.android.support.DaggerAppCompatActivity;
 import de.hdodenhof.circleimageview.BuildConfig;
 import timber.log.Timber;
 
-public class BookListActivity extends BaseActivity implements OnBookListener {
+//public class BookListActivity extends BaseActivity implements OnBookListener {
+public class BookListActivity extends DaggerAppCompatActivity implements OnBookListener {
+
+    private ActivityBookListBinding binding;
 
     private BookListViewModel mBookListViewModel;
-    private RecyclerView mRecyclerView;
-    private SearchView mSearchView;
     private BookRecyclerAdapter mAdapter;
-//    private BookListViewModel.ViewState savedViewState;
 
     @Inject
     ViewModelProviderFactory viewModelProviderFactory;
@@ -53,16 +55,15 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_book_list);
-        mRecyclerView = findViewById(R.id.book_list);
-        mSearchView = findViewById(R.id.search_view);
+        binding = ActivityBookListBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         mBookListViewModel = new ViewModelProvider(this, viewModelProviderFactory).get(BookListViewModel.class);
 
         initRecyclerView();
         initSearchView();
-        setSupportActionBar(findViewById(R.id.toolbar));
+
+        setSupportActionBar(binding.toolbar);
     }
 
 
@@ -141,7 +142,7 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
     }
 
     private void initSearchView() {
-        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 searchBookApi(query, false);
@@ -160,33 +161,33 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
 
         mAdapter = new BookRecyclerAdapter(this, requestManager, viewPreloadSizeProvider);
         VerticalSpacingItemDecoration itemDecoration = new VerticalSpacingItemDecoration(30);
-        mRecyclerView.addItemDecoration(itemDecoration);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        binding.bookList.addItemDecoration(itemDecoration);
+        binding.bookList.setLayoutManager(new LinearLayoutManager(this));
 
         RecyclerViewPreloader<String> preloader = new RecyclerViewPreloader<>(
                 Glide.with(this),
                 mAdapter,
                 viewPreloadSizeProvider,
                 32);
-        mRecyclerView.addOnScrollListener(preloader);
+        binding.bookList.addOnScrollListener(preloader);
 
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        binding.bookList.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
 
-                if (!mRecyclerView.canScrollVertically(1) && mBookListViewModel.getViewState().getValue() == BookListViewModel.ViewState.BOOKS) {
+                if (!binding.bookList.canScrollVertically(1) && mBookListViewModel.getViewState().getValue() == BookListViewModel.ViewState.BOOKS) {
                     mBookListViewModel.searchNextPage();
                 }
             }
         });
-        mRecyclerView.setAdapter(mAdapter);
+        binding.bookList.setAdapter(mAdapter);
     }
 
     private void displayCategories() {
-        mRecyclerView.scrollToPosition(0);
+        binding.bookList.scrollToPosition(0);
         mAdapter.displayBookCategories();
-        mSearchView.setQuery("", false);
+        binding.searchView.setQuery("", false);
     }
 
     private void processResourceByStatus(@NonNull Resource<List<Book>> listResource) {
@@ -234,19 +235,23 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
 
 
     private void searchBookApi(String query, boolean searchTopic) {
-        mRecyclerView.scrollToPosition(0);
+        binding.bookList.scrollToPosition(0);
         mBookListViewModel.searchBooksApi(query, 1, searchTopic);
-        mSearchView.clearFocus();
+        binding.searchView.clearFocus();
     }
 
 
     private void displayLoading(boolean displayLoading) {
         if (displayLoading) {
-            mRecyclerView.setVisibility(View.INVISIBLE);
+            binding.bookList.setVisibility(View.INVISIBLE);
             showProgressBar(true);
         } else {
             showProgressBar(false);
-            mRecyclerView.setVisibility(View.VISIBLE);
+            binding.bookList.setVisibility(View.VISIBLE);
         }
+    }
+
+    public void showProgressBar( boolean visibility) {
+        binding.progressBar.setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
     }
 }
