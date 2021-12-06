@@ -59,10 +59,6 @@ public class BookListViewModel extends AndroidViewModel {
         return viewState;
     }
 
-    public void setViewState(ViewState state) {
-        viewState.setValue(state);
-    }
-
     public LiveData<Resource<List<Book>>> getBooks() {
         return books;
     }

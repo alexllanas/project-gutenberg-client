@@ -37,7 +37,7 @@ public class AppModule {
 
     @Singleton
     @Provides
-    static BookApi provideAuthApi(Retrofit retrofit) {
+    static BookApi provideBookApi(Retrofit retrofit) {
         return retrofit.create(BookApi.class);
     }
 

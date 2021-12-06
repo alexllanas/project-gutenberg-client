@@ -22,10 +22,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
 import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.functions.Function;
 import okhttp3.ResponseBody;
 import timber.log.Timber;
 
@@ -170,5 +172,7 @@ public class BookRepository {
         }
     }
 
-
+    public LiveData<List<Book>> getBooks() {
+        return bookDao.getBooks();
+    }
 }

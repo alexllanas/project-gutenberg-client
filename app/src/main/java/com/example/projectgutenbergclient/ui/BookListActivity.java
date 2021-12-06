@@ -235,7 +235,6 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
     private void searchBookApi(String query, boolean searchTopic) {
         mRecyclerView.scrollToPosition(0);
         mBookListViewModel.searchBooksApi(query, 1, searchTopic);
-//        mSearchView.setQuery("", false);
         mSearchView.clearFocus();
     }
 

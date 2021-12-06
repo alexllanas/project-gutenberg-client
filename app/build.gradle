@@ -21,6 +21,7 @@ android {
                 arguments += ["room.schemaLocation": "$projectDir/schemas)".toString()]
             }
         }
+
     }
 
     buildTypes {
@@ -38,7 +39,9 @@ android {
         androidTest.java.srcDirs += "src/test-common/java"
         test.java.srcDirs += "src/test-common/java"
     }
+
 }
+
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -119,8 +122,9 @@ dependencies {
 
     // -------- LOCAL UNIT TESTS (use JUnit5)
     // JUnit Jupiter
-    def junit_jupiter_version = "5.8.0"
+    def junit_jupiter_version = "5.8.2"
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junit_jupiter_version"
     testImplementation "org.junit.jupiter:junit-jupiter-params:$junit_jupiter_version"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit_jupiter_version"
+    testImplementation("org.junit.jupiter:junit-jupiter:$junit_jupiter_version")
 }

@@ -50,7 +50,6 @@ public class Book implements Parcelable {
     /**
      * Class constructors
      */
-
     public Book() {
     }
 
@@ -97,6 +96,7 @@ public class Book implements Parcelable {
         this.timestamp = new Date().getTime();
     }
 
+    @Ignore
     public Book(long id, String title, List<Author> authors, ArrayList<String> subjects, Formats formats, long timestamp) {
         this.id = id;
         this.title = title;
