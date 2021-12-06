@@ -184,6 +184,7 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
     }
 
     private void displayCategories() {
+        mRecyclerView.scrollToPosition(0);
         mAdapter.displayBookCategories();
         mSearchView.setQuery("", false);
     }
