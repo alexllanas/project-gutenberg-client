@@ -1,6 +1,8 @@
 package com.example.projectgutenbergclient.viewmodels;
 
 import android.app.Application;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,7 +23,10 @@ import javax.inject.Inject;
 
 public class BookListViewModel extends AndroidViewModel {
 
-    public enum ViewState {CATEGORIES, BOOKS}
+    public enum ViewState {
+        CATEGORIES,
+        BOOKS
+    }
 
     private MutableLiveData<ViewState> viewState;
     private final MediatorLiveData<Resource<List<Book>>> books = new MediatorLiveData<>();
@@ -52,6 +57,10 @@ public class BookListViewModel extends AndroidViewModel {
 
     public LiveData<ViewState> getViewState() {
         return viewState;
+    }
+
+    public void setViewState(ViewState state) {
+        viewState.setValue(state);
     }
 
     public LiveData<Resource<List<Book>>> getBooks() {

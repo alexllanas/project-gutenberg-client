@@ -42,6 +42,7 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
     private RecyclerView mRecyclerView;
     private SearchView mSearchView;
     private BookRecyclerAdapter mAdapter;
+//    private BookListViewModel.ViewState savedViewState;
 
     @Inject
     ViewModelProviderFactory viewModelProviderFactory;
@@ -61,8 +62,14 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
 
         initRecyclerView();
         initSearchView();
-        subscribeObservers();
         setSupportActionBar(findViewById(R.id.toolbar));
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        subscribeObservers();
     }
 
     @Override
@@ -178,6 +185,7 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
 
     private void displayCategories() {
         mAdapter.displayBookCategories();
+        mSearchView.setQuery("", false);
     }
 
     private void processResourceByStatus(@NonNull Resource<List<Book>> listResource) {
@@ -192,6 +200,7 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
             }
             case SUCCESS: {
                 mAdapter.hideLoading();
+                assert listResource.data != null;
                 mAdapter.setBooks(listResource.data);
                 break;
             }
@@ -200,6 +209,7 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
 
     private void processErrorResource(Resource<List<Book>> listResource) {
         mAdapter.hideLoading();
+        assert listResource.data != null;
         mAdapter.setBooks(listResource.data);
 
         if (BuildConfig.DEBUG) {
@@ -225,6 +235,7 @@ public class BookListActivity extends BaseActivity implements OnBookListener {
     private void searchBookApi(String query, boolean searchTopic) {
         mRecyclerView.scrollToPosition(0);
         mBookListViewModel.searchBooksApi(query, 1, searchTopic);
+//        mSearchView.setQuery("", false);
         mSearchView.clearFocus();
     }
 

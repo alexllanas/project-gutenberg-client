@@ -29,7 +29,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private static final int BOOK_TYPE = 3;
     private static final int EXHAUSTED_TYPE = 4;
 
-    private List<Book> mBooks;
+    private List<Book> mBooks = new ArrayList<>();
     private final OnBookListener mOnBookListener;
     private final RequestManager requestManager;
     private final ViewPreloadSizeProvider<String> viewPreloadSizeProvider;
