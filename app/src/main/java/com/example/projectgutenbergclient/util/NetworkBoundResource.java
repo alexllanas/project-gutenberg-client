@@ -65,9 +65,6 @@ public abstract class NetworkBoundResource<CacheObject, RequestObject> {
      * @param dbSource
      */
     private void fetchFromNetwork(final LiveData<CacheObject> dbSource){
-
-        Log.d(TAG, "fetchFromNetwork: called.");
-
         // update LiveData for loading status
         results.addSource(dbSource, new Observer<CacheObject>() {
             @Override
@@ -92,8 +89,6 @@ public abstract class NetworkBoundResource<CacheObject, RequestObject> {
                  */
 
                 if(requestObjectApiResponse instanceof ApiResponse.ApiSuccessResponse){
-                    Log.d(TAG, "onChanged: ApiSuccessResponse.");
-
                     appExecutors.diskIO().execute(new Runnable() {
                         @Override
                         public void run() {
@@ -116,7 +111,6 @@ public abstract class NetworkBoundResource<CacheObject, RequestObject> {
                     });
                 }
                 else if(requestObjectApiResponse instanceof ApiResponse.ApiEmptyResponse){
-                    Log.d(TAG, "onChanged: ApiEmptyResponse");
                     appExecutors.mainThread().execute(new Runnable() {
                         @Override
                         public void run() {
@@ -130,7 +124,6 @@ public abstract class NetworkBoundResource<CacheObject, RequestObject> {
                     });
                 }
                 else if(requestObjectApiResponse instanceof ApiResponse.ApiErrorResponse){
-                    Log.d(TAG, "onChanged: ApiErrorResponse.");
                     results.addSource(dbSource, new Observer<CacheObject>() {
                         @Override
                         public void onChanged(@Nullable CacheObject cacheObject) {

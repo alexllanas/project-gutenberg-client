@@ -30,7 +30,7 @@ public class RetrofitService {
 
             .build();
 
-    private static Retrofit.Builder retrofitBuilder =
+    private static final Retrofit.Builder retrofitBuilder =
             new Retrofit.Builder()
                     .baseUrl(Constants.BASE_URL)
 //                    .client(client)

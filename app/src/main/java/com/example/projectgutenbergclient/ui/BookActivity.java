@@ -20,7 +20,9 @@ import com.example.projectgutenbergclient.viewmodels.ViewModelProviderFactory;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 import javax.inject.Inject;
 
@@ -49,9 +51,9 @@ public class BookActivity extends DaggerAppCompatActivity {
 
         subscribeObservers();
 
-        if (savedInstanceState == null) {
-            searchBookContent();
-        }
+//        if (savedInstanceState == null) {
+        searchBookContent();
+//        }
     }
 
     private void subscribeObservers() {
@@ -82,13 +84,13 @@ public class BookActivity extends DaggerAppCompatActivity {
                 break;
             }
             case SUCCESS: {
-                showProgressBar(false);
                 if (contentPathResource.data != null) {
                     Timber.d("in success");
                     Timber.d("reading book content from file path");
                     String content = readFromFile(contentPathResource.data.getPath_id());
                     Timber.d("done reading from file");
                     binding.bookContent.setText(content);
+                    showProgressBar(false);
                     break;
                 }
             }
@@ -121,9 +123,14 @@ public class BookActivity extends DaggerAppCompatActivity {
             StringBuilder sb = new StringBuilder();
             String text;
 
-            while ((text = br.readLine()) != null) {
-                sb.append(text).append("\n");
+            while (br.ready()) {
+                String line = br.readLine();
+                sb.append(line + "\n");
             }
+
+//            while ((text = br.readLine()) != null) {
+//                sb.append(text).append("\n");
+//            }
             return sb.toString();
         } catch (IOException e) {
             e.printStackTrace();
@@ -139,13 +146,42 @@ public class BookActivity extends DaggerAppCompatActivity {
         return "";
     }
 
+//    private String readFromFile(long book_id) {
+//        FileInputStream fis = null;
+//        String filename = book_id + ".txt";
+//
+//        try {
+//            fis = openFileInput(filename);
+//            InputStreamReader isr = new InputStreamReader(fis);
+//            BufferedReader br = new BufferedReader(isr);
+//            StringBuilder sb = new StringBuilder();
+//            String text;
+//
+//            while ((text = br.readLine()) != null) {
+//                sb.append(text).append("\n");
+//            }
+//            return sb.toString();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            if (fis != null) {
+//                try {
+//                    fis.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//        return "";
+//    }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         mBookViewModel.cancelSearchRequest();
     }
 
-    public void showProgressBar( boolean visibility) {
+    public void showProgressBar(boolean visibility) {
         binding.progressBar.setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
     }
 }
