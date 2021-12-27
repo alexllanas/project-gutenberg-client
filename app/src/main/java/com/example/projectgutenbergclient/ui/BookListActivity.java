@@ -2,7 +2,6 @@ package com.example.projectgutenbergclient.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -15,18 +14,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader;
-import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.util.ViewPreloadSizeProvider;
-import com.example.projectgutenbergclient.R;
 import com.example.projectgutenbergclient.adapters.BookRecyclerAdapter;
 import com.example.projectgutenbergclient.adapters.OnBookListener;
 import com.example.projectgutenbergclient.databinding.ActivityBookListBinding;
 import com.example.projectgutenbergclient.models.Book;
 import com.example.projectgutenbergclient.models.Formats;
-import com.example.projectgutenbergclient.repositories.BookRepository;
 import com.example.projectgutenbergclient.util.Constants;
 import com.example.projectgutenbergclient.util.Resource;
-import com.example.projectgutenbergclient.util.VerticalSpacingItemDecoration;
+import com.example.projectgutenbergclient.util.SpacingItemDecoration;
 import com.example.projectgutenbergclient.viewmodels.BookListViewModel;
 import com.example.projectgutenbergclient.viewmodels.ViewModelProviderFactory;
 
@@ -58,14 +54,21 @@ public class BookListActivity extends DaggerAppCompatActivity implements OnBookL
         binding = ActivityBookListBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        mBookListViewModel = new ViewModelProvider(this, viewModelProviderFactory).get(BookListViewModel.class);
-
-        initRecyclerView();
-        initSearchView();
-
-        setSupportActionBar(binding.toolbar);
+        if (savedInstanceState == null) {
+            mBookListViewModel = new ViewModelProvider(this, viewModelProviderFactory).get(BookListViewModel.class);
+            initRecyclerView();
+            initSearchView();
+            setSupportActionBar(binding.toolbar);
+        }
+        hideStatusBar();
     }
 
+
+    private void hideStatusBar() {
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+    }
 
     @Override
     protected void onStart() {
@@ -160,7 +163,7 @@ public class BookListActivity extends DaggerAppCompatActivity implements OnBookL
         ViewPreloadSizeProvider<String> viewPreloadSizeProvider = new ViewPreloadSizeProvider<>();
 
         mAdapter = new BookRecyclerAdapter(this, requestManager, viewPreloadSizeProvider);
-        VerticalSpacingItemDecoration itemDecoration = new VerticalSpacingItemDecoration(30);
+        SpacingItemDecoration itemDecoration = new SpacingItemDecoration(30, 30);
         binding.bookList.addItemDecoration(itemDecoration);
         binding.bookList.setLayoutManager(new LinearLayoutManager(this));
 
@@ -251,7 +254,7 @@ public class BookListActivity extends DaggerAppCompatActivity implements OnBookL
         }
     }
 
-    public void showProgressBar( boolean visibility) {
+    public void showProgressBar(boolean visibility) {
         binding.progressBar.setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
     }
 }

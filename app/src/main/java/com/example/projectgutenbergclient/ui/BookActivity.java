@@ -1,10 +1,12 @@
 package com.example.projectgutenbergclient.ui;
 
+import android.app.ActionBar;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.core.view.WindowCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewbinding.ViewBinding;
@@ -42,6 +44,7 @@ public class BookActivity extends DaggerAppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityBookBinding.inflate(getLayoutInflater());
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
         setContentView(binding.getRoot());
         mBookViewModel = new ViewModelProvider(this, viewModelProviderFactory).get(BookViewModel.class);
@@ -51,10 +54,12 @@ public class BookActivity extends DaggerAppCompatActivity {
 
         subscribeObservers();
 
-//        if (savedInstanceState == null) {
-        searchBookContent();
-//        }
+
+        if (savedInstanceState == null) {
+            searchBookContent();
+        }
     }
+
 
     private void subscribeObservers() {
         mBookViewModel.getBookContent().observe(this, new Observer<Resource<ContentPath>>() {

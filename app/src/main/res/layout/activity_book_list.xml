@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".ui.BookListActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -20,6 +21,7 @@
                 android:id="@+id/search_view"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                app:iconifiedByDefault="false"
                 app:queryHint="Carroll, Lewis..." />
         </com.google.android.material.appbar.MaterialToolbar>
 
