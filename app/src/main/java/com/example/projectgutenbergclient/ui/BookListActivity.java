@@ -148,16 +148,13 @@ public class BookListActivity extends DaggerAppCompatActivity implements OnBookL
     }
 
     private void initSearchView() {
-        binding.input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    String query = binding.input.getText().toString();
-                    searchBookApi(query, false);
-                    return true;
-                } else {
-                    return false;
-                }
+        binding.input.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                String query = binding.input.getText().toString();
+                searchBookApi(query, false);
+                return true;
+            } else {
+                return false;
             }
         });
     }
@@ -193,7 +190,6 @@ public class BookListActivity extends DaggerAppCompatActivity implements OnBookL
     private void displayCategories() {
         binding.bookList.scrollToPosition(0);
         mAdapter.displayBookCategories();
-//        binding.searchView.setQuery("", false);
         binding.input.setText("");
     }
 

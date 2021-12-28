@@ -31,7 +31,6 @@ import javax.inject.Inject;
 import dagger.android.support.DaggerAppCompatActivity;
 import timber.log.Timber;
 
-//public class BookActivity extends BaseActivity {
 public class BookActivity extends DaggerAppCompatActivity {
 
     private ActivityBookBinding binding;
@@ -44,7 +43,6 @@ public class BookActivity extends DaggerAppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityBookBinding.inflate(getLayoutInflater());
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
         setContentView(binding.getRoot());
         mBookViewModel = new ViewModelProvider(this, viewModelProviderFactory).get(BookViewModel.class);
