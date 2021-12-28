@@ -2,7 +2,10 @@ package com.example.projectgutenbergclient.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -145,16 +148,16 @@ public class BookListActivity extends DaggerAppCompatActivity implements OnBookL
     }
 
     private void initSearchView() {
-        binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        binding.input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                searchBookApi(query, false);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    String query = binding.input.getText().toString();
+                    searchBookApi(query, false);
+                    return true;
+                } else {
+                    return false;
+                }
             }
         });
     }
@@ -190,7 +193,8 @@ public class BookListActivity extends DaggerAppCompatActivity implements OnBookL
     private void displayCategories() {
         binding.bookList.scrollToPosition(0);
         mAdapter.displayBookCategories();
-        binding.searchView.setQuery("", false);
+//        binding.searchView.setQuery("", false);
+        binding.input.setText("");
     }
 
     private void processResourceByStatus(@NonNull Resource<List<Book>> listResource) {
@@ -240,7 +244,8 @@ public class BookListActivity extends DaggerAppCompatActivity implements OnBookL
     private void searchBookApi(String query, boolean searchTopic) {
         binding.bookList.scrollToPosition(0);
         mBookListViewModel.searchBooksApi(query, 1, searchTopic);
-        binding.searchView.clearFocus();
+        binding.input.clearFocus();
+//        binding.searchView.clearFocus();
     }
 
 
